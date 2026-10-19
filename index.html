@@ -1,0 +1,2572 @@
+<!DOCTYPE html>
+<html lang="tr" class="h-full bg-slate-50">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Personel Puantaj | Güvenli Çalışma Takip Sistemi</title>
+  <meta name="description" content="100 çalışana kadar şirketler için güvenli, mobil uyumlu, PWA destekli personel puantaj takip sistemi.">
+  <meta name="theme-color" content="#4f46e5">
+  <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiUGVyc29uZWwgUHVhbnRhaiIsInNob3J0X25hbWUiOiJQdWFudGFqIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJzdGFydF91cmwiOiIuIiwiYmFja2dyb3VuZF9jb2xvciI6IiNmOGZhcGMiLCJ0aGVtZV9jb2xvciI6IiM0ZjQ2ZTUiLCJpY29ucyI6W119">
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; -webkit-tap-highlight-color: transparent; }
+    .touch-btn { touch-action: manipulation; }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+  </style>
+</head>
+<body class="h-full flex flex-col text-slate-800 antialiased selection:bg-brand-500 selection:text-white">
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toastContainer" class="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
+
+  <!-- MODAL BACKDROP & CONTAINER -->
+  <div id="modalContainer" class="fixed inset-0 z-40 hidden flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm transition-opacity">
+    <div id="modalCard" class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-100 transform transition-all scale-95 opacity-0">
+      <!-- Dynamic Modal Content Injected Here -->
+    </div>
+  </div>
+
+  <!-- APP HEADER -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-brand-500/20">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold text-slate-900 leading-tight flex items-center gap-2">
+            Personel Puantaj
+            <span class="text-[10px] font-semibold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full uppercase tracking-wider hidden sm:inline-block">v2.4 Canlı</span>
+          </h1>
+          <p class="text-xs text-slate-500 hidden sm:block">Güvenli Personel Takip & Puantaj Sistemi</p>
+        </div>
+      </div>
+
+      <!-- Real-time Istanbul Clock -->
+      <div class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-slate-100 rounded-lg text-slate-700 text-xs font-medium border border-slate-200/80">
+        <svg class="w-4 h-4 text-brand-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span id="liveClockDate">--</span>
+        <span class="font-bold text-slate-900 text-sm font-mono" id="liveClockTime">--:--:--</span>
+        <span class="text-[10px] bg-slate-200 px-1.5 py-0.5 rounded text-slate-600 font-mono">TR (+03:00)</span>
+      </div>
+
+      <!-- User Session Area -->
+      <div id="sessionHeaderArea" class="flex items-center gap-3">
+        <!-- Rendered based on state -->
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN VIEWPORT CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col">
+
+    <!-- VIEW 1: AUTHENTICATION / LOGIN -->
+    <div id="viewLogin" class="flex-1 flex items-center justify-center py-6 sm:py-12">
+      <div class="w-full max-w-md bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+        
+        <!-- Login Header -->
+        <div class="bg-gradient-to-r from-brand-700 to-indigo-600 px-6 py-8 text-white text-center relative overflow-hidden">
+          <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+          <div class="inline-flex p-3 bg-white/10 rounded-2xl backdrop-blur-md mb-3">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          </div>
+          <h2 class="text-2xl font-bold tracking-tight">Sisteme Giriş Yap</h2>
+          <p class="text-brand-100 text-xs mt-1">Lütfen yetki alanınıza göre giriş yapınız</p>
+        </div>
+
+        <!-- Role Tabs -->
+        <div class="grid grid-cols-2 p-1.5 bg-slate-100 m-6 rounded-xl text-sm font-semibold text-slate-600">
+          <button id="tabStaffBtn" class="py-2.5 rounded-lg bg-white text-brand-700 shadow-sm transition-all flex items-center justify-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+            Personel Girişi
+          </button>
+          <button id="tabAdminBtn" class="py-2.5 rounded-lg hover:text-slate-900 transition-all flex items-center justify-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+            Yönetici Girişi
+          </button>
+        </div>
+
+        <!-- Form 1: Personel Login -->
+        <form id="staffLoginForm" class="px-6 pb-6 space-y-4">
+          <div id="staffLockoutAlert" class="hidden p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl flex items-start gap-2">
+            <svg class="w-4 h-4 flex-shrink-0 mt-0.5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            <div>
+              <p class="font-bold">Çok fazla hatalı deneme yapıldı!</p>
+              <p id="staffLockoutTimerText">Hesabınız güvenlik amacıyla geçici olarak kilitlendi. Kalan süre: 05:00</p>
+            </div>
+          </div>
+
+          <div>
+            <label for="staffTcInput" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">T.C. Kimlik Numarası</label>
+            <div class="relative">
+              <input type="text" id="staffTcInput" maxlength="11" pattern="\d{11}" placeholder="11 haneli T.C. Kimlik No" required autocomplete="username" inputmode="numeric" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none text-slate-900 font-mono tracking-wider transition-all placeholder:font-sans placeholder:tracking-normal">
+              <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-slate-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"/></svg>
+              </div>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-1">Yönetici tarafından tanımlanmış T.C. kimlik numaranız.</p>
+          </div>
+
+          <div>
+            <label for="staffPinInput" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">4 Haneli PIN Kodu</label>
+            <div class="relative">
+              <input type="password" id="staffPinInput" maxlength="4" pattern="\d{4}" placeholder="••••" required autocomplete="current-password" inputmode="numeric" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none text-slate-900 text-center text-xl font-mono tracking-widest transition-all">
+              <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-slate-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+              </div>
+            </div>
+            <p id="staffAttemptsRemainingNotice" class="text-[11px] text-slate-500 mt-1 flex justify-between">
+              <span>Yöneticinizden aldığınız 4 haneli PIN.</span>
+              <span id="staffAttemptCount" class="font-semibold text-slate-700">5 deneme hakkı</span>
+            </p>
+          </div>
+
+          <button type="submit" id="staffSubmitBtn" class="w-full py-3.5 px-4 bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white font-semibold rounded-xl shadow-lg shadow-brand-500/25 transition-all flex items-center justify-center gap-2 touch-btn">
+            <span>Personel Girişi Yap</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          </button>
+
+          <!-- Quick Test Demo Staff Button -->
+          <div class="pt-2 border-t border-slate-100">
+            <button type="button" id="quickStaffDemoBtn" class="w-full py-2 px-3 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors flex items-center justify-center gap-1.5">
+              <span>🚀 Hızlı Test Girişi (Ahmet Yılmaz - T.C: 11111111110 / PIN: 1234)</span>
+            </button>
+          </div>
+        </form>
+
+        <!-- Form 2: Admin Login -->
+        <form id="adminLoginForm" class="px-6 pb-6 space-y-4 hidden">
+          <div id="firstRunSetupNotice" class="hidden p-3 bg-amber-50 border border-amber-200 text-amber-800 text-xs rounded-xl">
+            <p class="font-bold flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              İlk Yönetici Kurulumu
+            </p>
+            <p class="mt-0.5">Sistemde henüz yönetici tanımlanmamış. İlk girişinizde belirlediğiniz bilgiler güvenli yönetici hesabı olarak kaydedilecektir.</p>
+          </div>
+
+          <div>
+            <label for="adminUsernameInput" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Yönetici E-Posta veya Kullanıcı Adı</label>
+            <input type="text" id="adminUsernameInput" placeholder="admin@sirket.com" required autocomplete="username" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-slate-900 transition-all">
+          </div>
+
+          <div>
+            <label for="adminPasswordInput" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">Yönetici Şifresi</label>
+            <input type="password" id="adminPasswordInput" placeholder="••••••••" required autocomplete="current-password" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-slate-900 transition-all">
+          </div>
+
+          <button type="submit" id="adminSubmitBtn" class="w-full py-3.5 px-4 bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white font-semibold rounded-xl shadow-lg shadow-slate-900/20 transition-all flex items-center justify-center gap-2 touch-btn">
+            <span>Yönetici Paneline Giriş</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          </button>
+
+          <!-- Quick Test Demo Admin Button -->
+          <div class="pt-2 border-t border-slate-100">
+            <button type="button" id="quickAdminDemoBtn" class="w-full py-2 px-3 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors flex items-center justify-center gap-1.5">
+              <span>🔑 Hızlı Yönetici Girişi (admin / admin123)</span>
+            </button>
+          </div>
+        </form>
+
+        <!-- Security Footer -->
+        <div class="bg-slate-50 px-6 py-4 border-t border-slate-100 text-center">
+          <p class="text-[11px] text-slate-500 flex items-center justify-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+            256-bit SHA Şifreli PIN Koruması & Brute-Force Kilidi Aktif
+          </p>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- VIEW 2: STAFF (PERSONEL) ATTENDANCE DASHBOARD -->
+    <div id="viewStaff" class="hidden flex-1 flex flex-col gap-6">
+      
+      <!-- Staff Welcome & Live Status Banner -->
+      <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200/80 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div class="flex items-center gap-4">
+          <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center text-white text-2xl font-bold shadow-md shadow-brand-500/20">
+            <span id="staffAvatarInitials">AY</span>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="text-xl sm:text-2xl font-bold text-slate-900" id="staffDisplayName">Ahmet Yılmaz</h2>
+              <span id="staffStatusBadge" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">Henüz Giriş Yapılmadı</span>
+            </div>
+            <p class="text-sm text-slate-500 flex items-center gap-2 mt-1">
+              <span id="staffDepartmentDisplay">Yazılım & Bilişim</span> •
+              <span class="font-mono text-xs text-slate-400" id="staffTcMasked">T.C: *******1110</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Today Summary Counter -->
+        <div class="w-full md:w-auto flex items-center justify-between md:justify-end gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+          <div class="text-left">
+            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Bugünkü Giriş</div>
+            <div class="text-lg font-bold text-slate-900 font-mono" id="todayCheckInDisplay">--:--</div>
+          </div>
+          <div class="h-8 w-px bg-slate-200"></div>
+          <div class="text-left">
+            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Bugünkü Çıkış</div>
+            <div class="text-lg font-bold text-slate-900 font-mono" id="todayCheckOutDisplay">--:--</div>
+          </div>
+          <div class="h-8 w-px bg-slate-200"></div>
+          <div class="text-left">
+            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Toplam Mesai</div>
+            <div class="text-lg font-bold text-brand-600 font-mono" id="todayDurationDisplay">0s 00d</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MASSIVE ACTION BUTTONS FOR CLOCK-IN & CLOCK-OUT -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+        
+        <!-- CLOCK-IN BUTTON -->
+        <button id="btnClockIn" class="group relative flex flex-col items-center justify-center p-8 sm:p-10 rounded-3xl bg-gradient-to-br from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-xl shadow-emerald-500/25 transition-all transform hover:-translate-y-1 active:translate-y-0 active:scale-[0.99] touch-btn overflow-hidden disabled:opacity-50 disabled:pointer-events-none disabled:transform-none disabled:shadow-none">
+          <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+          <div class="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-inner">
+            <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+          </div>
+          <span class="text-2xl sm:text-3xl font-extrabold tracking-wide uppercase">İŞE GELDİM</span>
+          <span class="text-emerald-100 text-sm mt-1 font-medium" id="clockInBtnSubtext">Giriş saatini kaydetmek için dokunun</span>
+          <div id="clockInDoneBadge" class="hidden mt-3 px-3 py-1 bg-white/25 rounded-full text-xs font-semibold tracking-wider flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            <span id="clockInDoneTime">Giriş Yapıldı</span>
+          </div>
+        </button>
+
+        <!-- CLOCK-OUT BUTTON -->
+        <button id="btnClockOut" class="group relative flex flex-col items-center justify-center p-8 sm:p-10 rounded-3xl bg-gradient-to-br from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white shadow-xl shadow-rose-500/25 transition-all transform hover:-translate-y-1 active:translate-y-0 active:scale-[0.99] touch-btn overflow-hidden disabled:opacity-50 disabled:pointer-events-none disabled:transform-none disabled:shadow-none">
+          <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+          <div class="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-inner">
+            <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          </div>
+          <span class="text-2xl sm:text-3xl font-extrabold tracking-wide uppercase">İŞTEN ÇIKTIM</span>
+          <span class="text-rose-100 text-sm mt-1 font-medium" id="clockOutBtnSubtext">Çıkış saatini kaydetmek için dokunun</span>
+          <div id="clockOutDoneBadge" class="hidden mt-3 px-3 py-1 bg-white/25 rounded-full text-xs font-semibold tracking-wider flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            <span id="clockOutDoneTime">Çıkış Yapıldı</span>
+          </div>
+        </button>
+
+      </div>
+
+      <!-- Personal Attendance History Table -->
+      <div class="bg-white rounded-3xl shadow-sm border border-slate-200/80 overflow-hidden flex flex-col">
+        <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <h3 class="text-lg font-bold text-slate-900">Geçmiş Puantaj Kayıtlarım</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Yalnızca size ait çalışma ve mesai kayıtları listelenmektedir.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <select id="staffHistoryFilter" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-700 outline-none focus:ring-2 focus:ring-brand-500">
+              <option value="this-month">Bu Ay</option>
+              <option value="last-month">Geçen Ay</option>
+              <option value="all">Tüm Geçmiş</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-slate-600">
+            <thead class="bg-slate-50/75 text-xs uppercase font-semibold text-slate-500 border-b border-slate-100">
+              <tr>
+                <th class="px-6 py-3.5">Tarih</th>
+                <th class="px-6 py-3.5">Giriş Saati</th>
+                <th class="px-6 py-3.5">Çıkış Saati</th>
+                <th class="px-6 py-3.5">Toplam Süre</th>
+                <th class="px-6 py-3.5">Durum</th>
+                <th class="px-6 py-3.5">Açıklama / Düzeltme</th>
+              </tr>
+            </thead>
+            <tbody id="staffHistoryTableBody" class="divide-y divide-slate-100 font-medium">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- VIEW 3: ADMIN (YÖNETİCİ) DASHBOARD -->
+    <div id="viewAdmin" class="hidden flex-1 flex flex-col gap-6">
+
+      <!-- Admin Top Metrics Cards -->
+      <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+        
+        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Kayıtlı Personel</span>
+            <span class="text-xs px-2 py-0.5 bg-brand-50 text-brand-700 rounded-full font-bold">Maks 100</span>
+          </div>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span class="text-2xl font-extrabold text-slate-900" id="metricTotalStaff">0</span>
+            <span class="text-xs text-slate-400">/ 100</span>
+          </div>
+          <!-- Progress bar -->
+          <div class="mt-2 w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+            <div id="staffQuotaBar" class="bg-brand-600 h-1.5 rounded-full" style="width: 5%"></div>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Bugün Aktif</span>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span class="text-2xl font-extrabold text-emerald-600" id="metricActiveToday">0</span>
+            <span class="text-xs text-slate-500">personel geldi</span>
+          </div>
+          <div class="mt-2 text-[11px] text-slate-400">İşe giriş kaydı bulunanlar</div>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Şu An Mesaide</span>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span class="text-2xl font-extrabold text-indigo-600" id="metricCurrentlyWorking">0</span>
+            <span class="text-xs text-slate-500">içeride</span>
+          </div>
+          <div class="mt-2 text-[11px] text-slate-400">Çıkış yapmamış aktifler</div>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm">
+          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Eksik / Hatalı Kayıt</span>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span class="text-2xl font-extrabold text-amber-600" id="metricMissingRecords">0</span>
+            <span class="text-xs text-slate-500">kayıt</span>
+          </div>
+          <div class="mt-2 text-[11px] text-slate-400">Giriş/çıkış saati eksik olanlar</div>
+        </div>
+
+        <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm col-span-2 lg:col-span-1">
+          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Toplam Çalışma</span>
+          <div class="mt-2 flex items-baseline gap-2">
+            <span class="text-2xl font-extrabold text-slate-900" id="metricTotalHoursThisMonth">0</span>
+            <span class="text-xs text-slate-500">saat (bu ay)</span>
+          </div>
+          <div class="mt-2 text-[11px] text-slate-400">Onaylı mesai toplamı</div>
+        </div>
+
+      </div>
+
+      <!-- Admin Navigation Tabs -->
+      <div class="border-b border-slate-200">
+        <nav class="flex space-x-2 sm:space-x-6 overflow-x-auto pb-1" aria-label="Yönetici Menüsü">
+          <button id="adminTabPuantajBtn" class="py-3 px-3 sm:px-4 text-sm font-semibold border-b-2 border-brand-600 text-brand-600 whitespace-nowrap flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+            Puantaj Çizelgesi
+          </button>
+          <button id="adminTabStaffBtn" class="py-3 px-3 sm:px-4 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300 whitespace-nowrap flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+            Personel Yönetimi (100 Kişi)
+          </button>
+          <button id="adminTabReportsBtn" class="py-3 px-3 sm:px-4 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300 whitespace-nowrap flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            Aylık Özet Raporlar
+          </button>
+          <button id="adminTabAuditBtn" class="py-3 px-3 sm:px-4 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300 whitespace-nowrap flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Denetim İzi (Audit Log)
+          </button>
+          <button id="adminTabNotificationsBtn" class="py-3 px-3 sm:px-4 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300 whitespace-nowrap flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+            Zamanlanmış Bildirimler (08:00 / 18:30)
+          </button>
+        </nav>
+      </div>
+
+      <!-- SUB-TAB 1: PUANTAJ ÇİZELGESİ -->
+      <div id="adminPanelPuantaj" class="space-y-4">
+        
+        <!-- Filter and Action Bar -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-2 flex-1">
+            <input type="date" id="filterDateStart" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-700 outline-none focus:ring-2 focus:ring-brand-500">
+            <input type="date" id="filterDateEnd" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-700 outline-none focus:ring-2 focus:ring-brand-500">
+            <select id="filterStaffSelect" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-700 outline-none focus:ring-2 focus:ring-brand-500">
+              <option value="all">Tüm Personeller</option>
+            </select>
+            <select id="filterStatusSelect" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-700 outline-none focus:ring-2 focus:ring-brand-500">
+              <option value="all">Tüm Durumlar</option>
+              <option value="tamamlandi">Tamamlandı</option>
+              <option value="mesaide">Şu An Mesaide</option>
+              <option value="eksik">Eksik Kayıt</option>
+              <option value="duzeltildi">Düzeltilmiş Kayıt</option>
+            </select>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button id="btnOpenManualEntryModal" class="py-2 px-3.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-semibold shadow-sm transition-all flex items-center gap-1.5 touch-btn">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              <span>Manuel Kayıt Ekle</span>
+            </button>
+            <button id="btnExportPuantajCsv" class="py-2 px-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold shadow-sm transition-all flex items-center gap-1.5 touch-btn">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              <span>Excel (CSV) Aktar</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Master Attendance Table -->
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-200/80 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-600">
+              <thead class="bg-slate-50 text-xs uppercase font-semibold text-slate-500 border-b border-slate-200/80">
+                <tr>
+                  <th class="px-5 py-3.5">Tarih</th>
+                  <th class="px-5 py-3.5">Personel</th>
+                  <th class="px-5 py-3.5">T.C. No</th>
+                  <th class="px-5 py-3.5">Departman</th>
+                  <th class="px-5 py-3.5">Giriş Saati</th>
+                  <th class="px-5 py-3.5">Çıkış Saati</th>
+                  <th class="px-5 py-3.5">Çalışma Süresi</th>
+                  <th class="px-5 py-3.5">Durum</th>
+                  <th class="px-5 py-3.5 text-right">İşlem</th>
+                </tr>
+              </thead>
+              <tbody id="adminPuantajTableBody" class="divide-y divide-slate-100 font-medium">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+          <div id="adminPuantajEmptyNotice" class="hidden p-8 text-center text-slate-400 text-sm">
+            Filtreleme kriterlerine uygun puantaj kaydı bulunamadı.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SUB-TAB 2: PERSONEL YÖNETİMİ (100 KİŞİ KOTA KONTROLLÜ) -->
+      <div id="adminPanelStaff" class="hidden space-y-4">
+        
+        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              Personel Kadrosu
+              <span id="staffCapacityBadge" class="text-xs bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-full font-mono">5 / 100</span>
+            </h3>
+            <p class="text-xs text-slate-500 mt-0.5">Personel hesapları yalnızca yönetici tarafından açılır. T.C. Kimlik ve 4 haneli PIN ile giriş yaparlar.</p>
+          </div>
+          <button id="btnOpenAddStaffModal" class="py-2.5 px-4 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-semibold shadow-sm transition-all flex items-center gap-1.5 touch-btn">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+            <span>+ Yeni Personel Ekle</span>
+          </button>
+        </div>
+
+        <!-- Staff List Table -->
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-200/80 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-600">
+              <thead class="bg-slate-50 text-xs uppercase font-semibold text-slate-500 border-b border-slate-200/80">
+                <tr>
+                  <th class="px-6 py-3.5">Personel</th>
+                  <th class="px-6 py-3.5">T.C. Kimlik No</th>
+                  <th class="px-6 py-3.5">Departman</th>
+                  <th class="px-6 py-3.5">Giriş Durumu</th>
+                  <th class="px-6 py-3.5">Durum (Aktif/Pasif)</th>
+                  <th class="px-6 py-3.5 text-right">İşlemler</th>
+                </tr>
+              </thead>
+              <tbody id="adminStaffTableBody" class="divide-y divide-slate-100 font-medium">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SUB-TAB 3: AYLIK ÖZET RAPORLAR -->
+      <div id="adminPanelReports" class="hidden space-y-4">
+        
+        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <div>
+              <label for="reportMonthSelect" class="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Rapor Dönemi</label>
+              <select id="reportMonthSelect" class="mt-1 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 outline-none focus:ring-2 focus:ring-brand-500">
+                <!-- Months populated dynamically -->
+              </select>
+            </div>
+          </div>
+          <button id="btnExportMonthlyReportCsv" class="py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold shadow-sm transition-all flex items-center gap-1.5 touch-btn">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <span>Aylık Raporu Excel (CSV) Olarak İndir</span>
+          </button>
+        </div>
+
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-200/80 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-600">
+              <thead class="bg-slate-50 text-xs uppercase font-semibold text-slate-500 border-b border-slate-200/80">
+                <tr>
+                  <th class="px-6 py-3.5">Personel</th>
+                  <th class="px-6 py-3.5">Departman</th>
+                  <th class="px-6 py-3.5">Çalışılan Gün Sayısı</th>
+                  <th class="px-6 py-3.5">Toplam Mesai Süresi</th>
+                  <th class="px-6 py-3.5">Günlük Ortalama</th>
+                  <th class="px-6 py-3.5">Geç Giriş Sayısı</th>
+                  <th class="px-6 py-3.5">Eksik Çıkış Sayısı</th>
+                </tr>
+              </thead>
+              <tbody id="adminReportsTableBody" class="divide-y divide-slate-100 font-medium">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SUB-TAB 4: DENETİM İZİ (AUDIT LOG) -->
+      <div id="adminPanelAudit" class="hidden space-y-4">
+        
+        <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+          <div>
+            <h3 class="text-base font-bold text-slate-900">Yönetici Denetim İzi & Değişiklik Günlüğü</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Tüm manuel puantaj düzeltmeleri, önceki ve yeni değerleri, işlemi yapan yönetici ve gerekçesiyle birlikte kaydedilir.</p>
+          </div>
+          <span class="text-xs font-semibold px-2.5 py-1 bg-slate-100 text-slate-700 rounded-lg" id="auditLogCountBadge">0 İşlem Kayıtlı</span>
+        </div>
+
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-200/80 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-600">
+              <thead class="bg-slate-50 text-xs uppercase font-semibold text-slate-500 border-b border-slate-200/80">
+                <tr>
+                  <th class="px-5 py-3.5">Zaman (TR)</th>
+                  <th class="px-5 py-3.5">İşlemi Yapan</th>
+                  <th class="px-5 py-3.5">İlgili Personel</th>
+                  <th class="px-5 py-3.5">Puantaj Tarihi</th>
+                  <th class="px-5 py-3.5">Eski Değer</th>
+                  <th class="px-5 py-3.5">Yeni Değer</th>
+                  <th class="px-5 py-3.5">Düzeltme Gerekçesi</th>
+                </tr>
+              </thead>
+              <tbody id="adminAuditTableBody" class="divide-y divide-slate-100 text-xs">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SUB-TAB 5: ZAMANLANMIŞ BİLDİRİMLER (08:00 & 18:30) -->
+      <div id="adminPanelNotifications" class="hidden space-y-6">
+        
+        <!-- Push Info & Status Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <div class="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <span class="p-2.5 bg-brand-50 text-brand-600 rounded-xl inline-block">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                </span>
+                <span id="pushSupportBadge" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700">Kontrol Ediliyor...</span>
+              </div>
+              <h4 class="text-base font-bold text-slate-900">Tarayıcı Bildirim İzin & Durumu</h4>
+              <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                Personellerin işe giriş (08:00) ve işten çıkış (18:30) hatırlatmalarını alabilmesi için tarayıcı bildirim izni gereklidir.
+              </p>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+              <span class="text-xs text-slate-600 font-medium">Mevcut İzin: <strong id="currentPermissionText">Varsayılan</strong></span>
+              <button id="btnRequestNotificationPerm" class="py-2 px-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-semibold transition-all touch-btn">
+                Bildirim İzni İste
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <span class="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl inline-block">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </span>
+                <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700">Europe/Istanbul</span>
+              </div>
+              <h4 class="text-base font-bold text-slate-900">Zamanlanmış Otomatik Gönderimler</h4>
+              <ul class="mt-3 space-y-2 text-xs text-slate-600">
+                <li class="flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-brand-500"></span>
+                  <strong>Her gün 08:00:</strong> "Lütfen işe giriş kaydınızı yapın."
+                </li>
+                <li class="flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                  <strong>Her gün 18:30:</strong> "Lütfen işten çıkış kaydınızı yapın."
+                </li>
+              </ul>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-slate-100 flex items-center gap-2">
+              <button id="btnTestMorningNotification" class="flex-1 py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-semibold transition-all touch-btn">
+                🔔 08:00 Test Et
+              </button>
+              <button id="btnTestEveningNotification" class="flex-1 py-2 px-3 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-semibold transition-all touch-btn">
+                🔔 18:30 Test Et
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Technical Server Architecture Guide Card -->
+        <div class="bg-gradient-to-br from-slate-900 to-indigo-950 p-6 sm:p-8 rounded-3xl text-white shadow-xl">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <span class="text-xs font-bold uppercase tracking-wider text-brand-300">Üretim Ortamı (Production) Mimarisi</span>
+              <h4 class="text-lg font-bold text-white mt-1">Kapalıyken Gönderim İçin Gerçek Web Push & Cron Altyapısı</h4>
+            </div>
+            <span class="px-2.5 py-1 bg-white/10 rounded-full text-[11px] font-mono text-brand-200">Tamamen Ücretsiz (VAPID)</span>
+          </div>
+
+          <p class="text-xs text-slate-300 mt-3 leading-relaxed">
+            Web uygulamasının telefon kapalıyken veya sekme kapalıyken gerçek push bildirimi alabilmesi için <strong>W3C Web Push</strong> standardı uygulanır. İstemci cihaz <code>PushManager.subscribe()</code> ile tarayıcının push servisine abone olur; sunucu tarafı <code>node-cron</code> ile Türkiye saatiyle 08:00 ve 18:30'da VAPID anahtarlarını kullanarak bildirim fırlatır.
+          </p>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6 text-xs">
+            <div class="bg-white/5 p-4 rounded-2xl border border-white/10">
+              <span class="text-brand-300 font-bold block mb-1">1. VAPID & Service Worker</span>
+              <p class="text-slate-400">Ücretsiz VAPID anahtarları (Public/Private) kullanılır. Harici ücretli servise gerek yoktur.</p>
+            </div>
+            <div class="bg-white/5 p-4 rounded-2xl border border-white/10">
+              <span class="text-emerald-300 font-bold block mb-1">2. Cron Zamanlayıcı (TR Saati)</span>
+              <p class="text-slate-400">Sunucuda <code>0 8 * * *</code> ve <code>30 18 * * *</code> cron işleri <code>tz: 'Europe/Istanbul'</code> ile çalışır.</p>
+            </div>
+            <div class="bg-white/5 p-4 rounded-2xl border border-white/10">
+              <span class="text-amber-300 font-bold block mb-1">3. Cihaz Uyumluluğu</span>
+              <p class="text-slate-400">Android Chrome/Edge/Firefox'ta doğrudan çalışır; iOS Safari'de uygulamanın ana ekrana PWA olarak eklenmesi gerekir.</p>
+            </div>
+          </div>
+
+          <div class="mt-6 flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-white/10">
+            <span class="text-[11px] text-slate-400">Backend Node.js + Express + Web-Push hazır paketi sistemde oluşturulmuştur.</span>
+            <button id="btnShowServerCodeModal" class="py-2 px-3.5 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-semibold transition-all">
+              Sunucu & Cron Kodlarını İncele
+            </button>
+          </div>
+        </div>
+
+        <!-- Notification Logs Table -->
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-200/80 overflow-hidden">
+          <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+            <h4 class="text-sm font-bold text-slate-900">Bildirim Gönderim Günlüğü</h4>
+            <span class="text-xs text-slate-400" id="notificationLogCountText">0 bildirim gönderildi</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-600">
+              <thead class="bg-slate-50 text-xs uppercase font-semibold text-slate-500 border-b border-slate-200/80">
+                <tr>
+                  <th class="px-6 py-3">Tarih / Saat</th>
+                  <th class="px-6 py-3">Bildirim Türü</th>
+                  <th class="px-6 py-3">Mesaj</th>
+                  <th class="px-6 py-3">Hedef Personel</th>
+                  <th class="px-6 py-3">Gönderim Durumu</th>
+                </tr>
+              </thead>
+              <tbody id="notificationLogsTableBody" class="divide-y divide-slate-100 text-xs">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-white border-t border-slate-200 py-4 px-6 text-center text-xs text-slate-500 mt-auto">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+      <p>© 2026 <strong>Personel Puantaj</strong> | Türkiye Cumhuriyeti Mevzuatına & KVKK İlkelerine Uygun Puantaj Sistemi</p>
+      <div class="flex items-center gap-3">
+        <button id="btnResetDemoData" class="text-slate-400 hover:text-rose-600 transition-colors text-xs underline">
+          Örnek Verileri Sıfırla / Fabrika Ayarları
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JAVASCRIPT CORE ENGINE -->
+  <script>
+    (function() {
+      'use strict';
+
+      // -------------------------------------------------------------
+      // CONFIGURATION & CONSTANTS
+      // -------------------------------------------------------------
+      const STORAGE_KEY = 'PERSONEL_PUANTAJ_DB_V2';
+      const TIMEZONE = 'Europe/Istanbul';
+      const MAX_STAFF_LIMIT = 100;
+      const MAX_LOGIN_ATTEMPTS = 5;
+      const LOCKOUT_DURATION_MS = 5 * 60 * 1000; // 5 minutes
+
+      // State Object
+      let state = {
+        adminUser: null, // { username, passwordHash, displayName }
+        staffList: [],   // [ { id, tc, pinHash, name, surname, department, active, createdAt } ]
+        attendance: [],  // [ { id, staffId, date, checkIn, checkOut, durationMinutes, status, notes, updatedBy, updatedAt } ]
+        auditLogs: [],   // [ { id, timestamp, adminName, staffName, recordDate, field, oldValue, newValue, reason } ]
+        notificationLogs: [], // [ { id, timestamp, title, body, targetCount, status } ]
+        currentUser: null, // { role: 'staff'|'admin', data: ... }
+        lockout: {
+          attempts: 0,
+          lockedUntil: 0
+        }
+      };
+
+      // -------------------------------------------------------------
+      // CRYPTO HELPER (SHA-256 via Web Crypto API)
+      // -------------------------------------------------------------
+      async function sha256(message) {
+        try {
+          const msgBuffer = new TextEncoder().encode(message);
+          const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+          const hashArray = Array.from(new Uint8Array(hashBuffer));
+          return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        } catch (e) {
+          // Fallback simple hash for older environments if needed
+          let hash = 0;
+          for (let i = 0; i < message.length; i++) {
+            hash = ((hash << 5) - hash) + message.charCodeAt(i);
+            hash |= 0;
+          }
+          return 'fallback_' + Math.abs(hash).toString(16);
+        }
+      }
+
+      // -------------------------------------------------------------
+      // DATE & TIME HELPERS (Strict Europe/Istanbul)
+      // -------------------------------------------------------------
+      function getNowIstanbul() {
+        // Return date formatted in Europe/Istanbul
+        const now = new Date();
+        const formatter = new Intl.DateTimeFormat('en-CA', {
+          timeZone: TIMEZONE,
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: false
+        });
+        const parts = formatter.formatToParts(now);
+        const map = {};
+        parts.forEach(p => map[p.type] = p.value);
+        return {
+          dateStr: `${map.year}-${map.month}-${map.day}`, // YYYY-MM-DD
+          timeStr: `${map.hour}:${map.minute}`,            // HH:MM
+          fullStr: `${map.day}.${map.month}.${map.year} ${map.hour}:${map.minute}:${map.second}`,
+          hour: parseInt(map.hour, 10),
+          minute: parseInt(map.minute, 10),
+          raw: now
+        };
+      }
+
+      function formatMinutesToHours(minutes) {
+        if (!minutes || minutes <= 0) return '0s 00d';
+        const h = Math.floor(minutes / 60);
+        const m = minutes % 60;
+        return `${h}s ${m.toString().padStart(2, '0')}d`;
+      }
+
+      function calculateMinutesBetween(time1, time2) {
+        if (!time1 || !time2) return 0;
+        const [h1, m1] = time1.split(':').map(Number);
+        const [h2, m2] = time2.split(':').map(Number);
+        const diff = (h2 * 60 + m2) - (h1 * 60 + m1);
+        return diff > 0 ? diff : 0;
+      }
+
+      // -------------------------------------------------------------
+      // STORAGE & INITIAL MOCK DATA
+      // -------------------------------------------------------------
+      async function initializeDatabase() {
+        try {
+          const stored = localStorage.getItem(STORAGE_KEY);
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            state.adminUser = parsed.adminUser;
+            state.staffList = parsed.staffList || [];
+            state.attendance = parsed.attendance || [];
+            state.auditLogs = parsed.auditLogs || [];
+            state.notificationLogs = parsed.notificationLogs || [];
+            return;
+          }
+        } catch (e) {
+          console.error("Storage read error:", e);
+        }
+
+        // If no stored state, load realistic seed data
+        await seedDefaultData();
+      }
+
+      async function saveState() {
+        try {
+          const payload = {
+            adminUser: state.adminUser,
+            staffList: state.staffList,
+            attendance: state.attendance,
+            auditLogs: state.auditLogs,
+            notificationLogs: state.notificationLogs
+          };
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+        } catch (e) {
+          console.error("Storage write error:", e);
+        }
+      }
+
+      async function seedDefaultData() {
+        const adminPassHash = await sha256('admin123');
+        state.adminUser = {
+          username: 'admin',
+          passwordHash: adminPassHash,
+          displayName: 'Sistem Yöneticisi'
+        };
+
+        const defaultPinHash = await sha256('1234');
+        const defaultPinHash2 = await sha256('5678');
+
+        state.staffList = [
+          { id: 'stf_1', tc: '11111111110', pinHash: defaultPinHash, name: 'Ahmet', surname: 'Yılmaz', department: 'Yazılım & Bilişim', active: true, createdAt: '2026-09-01' },
+          { id: 'stf_2', tc: '22222222220', pinHash: defaultPinHash, name: 'Ayşe', surname: 'Kaya', department: 'Muhasebe & Finans', active: true, createdAt: '2026-09-01' },
+          { id: 'stf_3', tc: '33333333330', pinHash: defaultPinHash, name: 'Mehmet', surname: 'Demir', department: 'İnsan Kaynakları', active: true, createdAt: '2026-09-05' },
+          { id: 'stf_4', tc: '44444444440', pinHash: defaultPinHash, name: 'Zeynep', surname: 'Çelik', department: 'Pazarlama & Satış', active: true, createdAt: '2026-09-10' },
+          { id: 'stf_5', tc: '55555555550', pinHash: defaultPinHash2, name: 'Can', surname: 'Öztürk', department: 'Lojistik & Depo', active: false, createdAt: '2026-09-15' }
+        ];
+
+        // Seed 5 days of realistic attendance
+        const today = getNowIstanbul().dateStr;
+        state.attendance = [
+          // Today
+          { id: 'att_1', staffId: 'stf_1', date: today, checkIn: '08:24', checkOut: null, durationMinutes: 0, status: 'Mesaide', notes: 'Zamanında giriş', updatedBy: null, updatedAt: null },
+          { id: 'att_2', staffId: 'stf_2', date: today, checkIn: '08:45', checkOut: null, durationMinutes: 0, status: 'Mesaide', notes: 'Giriş yapıldı', updatedBy: null, updatedAt: null },
+          // Past days for Ahmet
+          { id: 'att_3', staffId: 'stf_1', date: '2026-10-17', checkIn: '08:15', checkOut: '18:30', durationMinutes: 615, status: 'Tamamlandı', notes: 'Normal mesai', updatedBy: null, updatedAt: null },
+          { id: 'att_4', staffId: 'stf_1', date: '2026-10-16', checkIn: '08:30', checkOut: '18:15', durationMinutes: 585, status: 'Tamamlandı', notes: 'Normal mesai', updatedBy: null, updatedAt: null },
+          { id: 'att_5', staffId: 'stf_1', date: '2026-10-15', checkIn: '09:12', checkOut: '18:30', durationMinutes: 558, status: 'Geç Giriş', notes: 'Trafik gecikmesi', updatedBy: null, updatedAt: null },
+          // Ayşe
+          { id: 'att_6', staffId: 'stf_2', date: '2026-10-17', checkIn: '08:05', checkOut: '17:45', durationMinutes: 580, status: 'Tamamlandı', notes: 'Normal mesai', updatedBy: null, updatedAt: null },
+          { id: 'att_7', staffId: 'stf_2', date: '2026-10-16', checkIn: '08:10', checkOut: null, durationMinutes: 0, status: 'Eksik Kayıt', notes: 'Çıkış basılmadı', updatedBy: null, updatedAt: null },
+          // Mehmet
+          { id: 'att_8', staffId: 'stf_3', date: '2026-10-17', checkIn: '08:30', checkOut: '18:30', durationMinutes: 600, status: 'Düzeltildi', notes: 'Kart okutulamadı', updatedBy: 'Sistem Yöneticisi', updatedAt: '2026-10-17 19:00:00' },
+          { id: 'att_9', staffId: 'stf_3', date: '2026-10-16', checkIn: '08:25', checkOut: '18:20', durationMinutes: 595, status: 'Tamamlandı', notes: 'Normal mesai', updatedBy: null, updatedAt: null }
+        ];
+
+        state.auditLogs = [
+          {
+            id: 'aud_1',
+            timestamp: '2026-10-17 19:00:15',
+            adminName: 'Sistem Yöneticisi',
+            staffName: 'Mehmet Demir',
+            recordDate: '2026-10-17',
+            field: 'Çıkış Saati',
+            oldValue: 'Eksik (--:--)',
+            newValue: '18:30',
+            reason: 'Personel çıkış basmayı unuttuğunu bildirdi, amir teyidi alındı.'
+          }
+        ];
+
+        state.notificationLogs = [
+          {
+            id: 'notif_1',
+            timestamp: '2026-10-18 08:00:01',
+            title: 'İşe Giriş Hatırlatması',
+            body: 'Lütfen işe giriş kaydınızı yapın.',
+            targetCount: 4,
+            status: 'Başarılı (Zamanlanmış)'
+          }
+        ];
+
+        await saveState();
+      }
+
+      // -------------------------------------------------------------
+      // UI FEEDBACK: TOAST NOTIFICATIONS & MODALS (No alert/confirm)
+      // -------------------------------------------------------------
+      function showToast(message, type = 'info', duration = 4000) {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = 'pointer-events-auto transform transition-all duration-300 ease-out translate-y-2 opacity-0 flex items-center gap-3 p-4 rounded-2xl shadow-xl text-white text-xs font-semibold backdrop-blur-md';
+
+        let icon = '';
+        if (type === 'success') {
+          toast.classList.add('bg-emerald-600/95', 'border', 'border-emerald-500');
+          icon = '<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>';
+        } else if (type === 'error') {
+          toast.classList.add('bg-rose-600/95', 'border', 'border-rose-500');
+          icon = '<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>';
+        } else if (type === 'warning') {
+          toast.classList.add('bg-amber-600/95', 'border', 'border-amber-500');
+          icon = '<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>';
+        } else {
+          toast.classList.add('bg-slate-900/95', 'border', 'border-slate-800');
+          icon = '<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+        }
+
+        toast.innerHTML = `${icon}<span>${escapeHtml(message)}</span>`;
+        container.appendChild(toast);
+
+        // Animate in
+        requestAnimationFrame(() => {
+          toast.classList.remove('translate-y-2', 'opacity-0');
+        });
+
+        // Remove after duration
+        setTimeout(() => {
+          toast.classList.add('opacity-0', 'translate-y-2');
+          setTimeout(() => toast.remove(), 300);
+        }, duration);
+      }
+
+      function openModal(title, bodyHtml, onConfirm = null, confirmText = 'Onayla', cancelText = 'İptal') {
+        const container = document.getElementById('modalContainer');
+        const card = document.getElementById('modalCard');
+
+        let footerHtml = `
+          <div class="bg-slate-50 px-6 py-4 flex items-center justify-end gap-3 border-t border-slate-100">
+            <button id="modalCancelBtn" type="button" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 rounded-xl hover:bg-slate-200/60 transition-colors">
+              ${cancelText}
+            </button>
+            ${onConfirm ? `
+              <button id="modalConfirmBtn" type="button" class="px-4 py-2 text-xs font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-xl shadow-sm transition-all">
+                ${confirmText}
+              </button>
+            ` : ''}
+          </div>
+        `;
+
+        card.innerHTML = `
+          <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+            <h3 class="text-base font-bold text-slate-900">${escapeHtml(title)}</h3>
+            <button id="modalCloseXBtn" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <div class="p-6 max-h-[75vh] overflow-y-auto">${bodyHtml}</div>
+          ${footerHtml}
+        `;
+
+        container.classList.remove('hidden');
+        requestAnimationFrame(() => {
+          card.classList.remove('scale-95', 'opacity-0');
+        });
+
+        const closeModal = () => {
+          card.classList.add('scale-95', 'opacity-0');
+          setTimeout(() => container.classList.add('hidden'), 200);
+        };
+
+        document.getElementById('modalCloseXBtn').onclick = closeModal;
+        document.getElementById('modalCancelBtn').onclick = closeModal;
+
+        if (onConfirm) {
+          document.getElementById('modalConfirmBtn').onclick = async () => {
+            const result = await onConfirm();
+            if (result !== false) {
+              closeModal();
+            }
+          };
+        }
+      }
+
+      function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      // -------------------------------------------------------------
+      // CLOCK & TIME TICKER (Europe/Istanbul)
+      // -------------------------------------------------------------
+      function updateLiveClock() {
+        const now = getNowIstanbul();
+        const dateEl = document.getElementById('liveClockDate');
+        const timeEl = document.getElementById('liveClockTime');
+
+        if (dateEl && timeEl) {
+          const dateFmt = new Intl.DateTimeFormat('tr-TR', {
+            timeZone: TIMEZONE,
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+            weekday: 'short'
+          });
+          dateEl.textContent = dateFmt.format(now.raw);
+          timeEl.textContent = `${now.raw.toLocaleTimeString('tr-TR', { timeZone: TIMEZONE })}`;
+        }
+
+        // Check for scheduled push notifications simulation at 08:00 and 18:30
+        checkScheduledAlarmTime(now);
+      }
+
+      let lastNotifiedMinute = '';
+      function checkScheduledAlarmTime(now) {
+        const currentMinuteStr = `${now.dateStr}_${now.timeStr}`;
+        if (currentMinuteStr === lastNotifiedMinute) return;
+
+        // Morning 08:00
+        if (now.timeStr === '08:00') {
+          lastNotifiedMinute = currentMinuteStr;
+          dispatchScheduledNotification('İşe Giriş Hatırlatması', 'Lütfen işe giriş kaydınızı yapın.', 'morning');
+        }
+        // Evening 18:30
+        if (now.timeStr === '18:30') {
+          lastNotifiedMinute = currentMinuteStr;
+          dispatchScheduledNotification('İşten Çıkış Hatırlatması', 'Lütfen işten çıkış kaydınızı yapın.', 'evening');
+        }
+      }
+
+      // -------------------------------------------------------------
+      // ROUTING & VIEW CONTROLLERS
+      // -------------------------------------------------------------
+      function showView(viewName) {
+        document.getElementById('viewLogin').classList.add('hidden');
+        document.getElementById('viewStaff').classList.add('hidden');
+        document.getElementById('viewAdmin').classList.add('hidden');
+
+        if (viewName === 'login') {
+          document.getElementById('viewLogin').classList.remove('hidden');
+          renderSessionHeader(null);
+        } else if (viewName === 'staff') {
+          document.getElementById('viewStaff').classList.remove('hidden');
+          renderSessionHeader('staff');
+          renderStaffDashboard();
+        } else if (viewName === 'admin') {
+          document.getElementById('viewAdmin').classList.remove('hidden');
+          renderSessionHeader('admin');
+          renderAdminDashboard();
+        }
+      }
+
+      function renderSessionHeader(role) {
+        const area = document.getElementById('sessionHeaderArea');
+        if (!role || !state.currentUser) {
+          area.innerHTML = `
+            <span class="text-xs text-slate-500 font-medium">Giriş Yapılmadı</span>
+          `;
+          return;
+        }
+
+        if (role === 'staff') {
+          const staff = state.currentUser.data;
+          area.innerHTML = `
+            <div class="flex items-center gap-3">
+              <div class="text-right hidden sm:block">
+                <div class="text-xs font-bold text-slate-800">${escapeHtml(staff.name + ' ' + staff.surname)}</div>
+                <div class="text-[10px] text-slate-400 font-medium">${escapeHtml(staff.department)}</div>
+              </div>
+              <button id="btnLogoutTop" class="px-3 py-1.5 bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-600 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5 touch-btn">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                <span>Çıkış</span>
+              </button>
+            </div>
+          `;
+        } else if (role === 'admin') {
+          const admin = state.currentUser.data;
+          area.innerHTML = `
+            <div class="flex items-center gap-3">
+              <div class="text-right hidden sm:block">
+                <div class="text-xs font-bold text-slate-900">${escapeHtml(admin.displayName)}</div>
+                <div class="text-[10px] text-brand-600 font-bold uppercase tracking-wider">Yönetici Paneli</div>
+              </div>
+              <button id="btnLogoutTop" class="px-3 py-1.5 bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-600 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5 touch-btn">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                <span>Güvenli Çıkış</span>
+              </button>
+            </div>
+          `;
+        }
+
+        const logoutBtn = document.getElementById('btnLogoutTop');
+        if (logoutBtn) {
+          logoutBtn.onclick = handleLogout;
+        }
+      }
+
+      function handleLogout() {
+        state.currentUser = null;
+        showToast('Başarıyla çıkış yapıldı.', 'info');
+        showView('login');
+      }
+
+      // -------------------------------------------------------------
+      // AUTHENTICATION LOGIC (BRUTE-FORCE PROTECTION & SECURITY)
+      // -------------------------------------------------------------
+      async function handleStaffLogin(tc, pin) {
+        const now = Date.now();
+
+        // Check brute-force lockout
+        if (state.lockout.lockedUntil > now) {
+          const remainingSec = Math.ceil((state.lockout.lockedUntil - now) / 1000);
+          const min = Math.floor(remainingSec / 60);
+          const sec = remainingSec % 60;
+          showToast(`Çok fazla hatalı deneme! Lütfen ${min}:${sec.toString().padStart(2, '0')} sonra tekrar deneyin.`, 'error');
+          return;
+        }
+
+        // Validate TC format
+        if (!/^\d{11}$/.test(tc)) {
+          showToast('T.C. Kimlik numarası tam 11 haneli rakam olmalıdır.', 'warning');
+          return;
+        }
+        if (!/^\d{4}$/.test(pin)) {
+          showToast('PIN kodu 4 haneli rakam olmalıdır.', 'warning');
+          return;
+        }
+
+        const staff = state.staffList.find(s => s.tc === tc);
+        if (!staff) {
+          registerFailedAttempt();
+          showToast('Girdiğiniz T.C. Kimlik numarası sistemde kayıtlı değil.', 'error');
+          return;
+        }
+
+        // Check active status
+        if (!staff.active) {
+          showToast('Personel hesabınız pasife alınmıştır. Lütfen yöneticiniz ile görüşün.', 'warning');
+          return;
+        }
+
+        // Hash and compare PIN
+        const enteredPinHash = await sha256(pin);
+        if (staff.pinHash !== enteredPinHash) {
+          registerFailedAttempt();
+          showToast('Hatalı PIN kodu girdiniz! Lütfen tekrar deneyin.', 'error');
+          return;
+        }
+
+        // Login Successful -> reset attempt counter
+        state.lockout.attempts = 0;
+        state.lockout.lockedUntil = 0;
+        updateLockoutUI();
+
+        state.currentUser = {
+          role: 'staff',
+          data: staff
+        };
+
+        // Clear password input for security
+        document.getElementById('staffPinInput').value = '';
+        showToast(`Hoş geldiniz, Sn. ${staff.name} ${staff.surname}`, 'success');
+        showView('staff');
+      }
+
+      function registerFailedAttempt() {
+        state.lockout.attempts++;
+        if (state.lockout.attempts >= MAX_LOGIN_ATTEMPTS) {
+          state.lockout.lockedUntil = Date.now() + LOCKOUT_DURATION_MS;
+          showToast('5 kez hatalı deneme yaptınız! Güvenlik nedeniyle giriş 5 dakika kilitlendi.', 'error');
+        }
+        updateLockoutUI();
+      }
+
+      function updateLockoutUI() {
+        const remaining = MAX_LOGIN_ATTEMPTS - state.lockout.attempts;
+        const countEl = document.getElementById('staffAttemptCount');
+        const alertEl = document.getElementById('staffLockoutAlert');
+        const submitBtn = document.getElementById('staffSubmitBtn');
+        const now = Date.now();
+
+        if (state.lockout.lockedUntil > now) {
+          alertEl.classList.remove('hidden');
+          submitBtn.disabled = true;
+          countEl.textContent = 'Kilitli';
+          countEl.classList.add('text-rose-600');
+        } else {
+          alertEl.classList.add('hidden');
+          submitBtn.disabled = false;
+          if (remaining < 3) {
+            countEl.textContent = `Son ${remaining} hak`;
+            countEl.classList.add('text-amber-600');
+          } else {
+            countEl.textContent = `${remaining} deneme hakkı`;
+            countEl.classList.remove('text-amber-600', 'text-rose-600');
+          }
+        }
+      }
+
+      async function handleAdminLogin(username, password) {
+        if (!username || !password) {
+          showToast('Lütfen kullanıcı adı ve şifre giriniz.', 'warning');
+          return;
+        }
+
+        const passwordHash = await sha256(password);
+
+        // If first run, create the admin account
+        if (!state.adminUser) {
+          state.adminUser = {
+            username: username.trim(),
+            passwordHash: passwordHash,
+            displayName: 'Yönetici'
+          };
+          await saveState();
+          showToast('Yönetici hesabı başarıyla oluşturuldu ve kaydedildi.', 'success');
+        } else {
+          if (state.adminUser.username !== username.trim() || state.adminUser.passwordHash !== passwordHash) {
+            showToast('Hatalı yönetici kullanıcı adı veya şifre!', 'error');
+            return;
+          }
+        }
+
+        state.currentUser = {
+          role: 'admin',
+          data: state.adminUser
+        };
+
+        document.getElementById('adminPasswordInput').value = '';
+        showToast('Yönetici paneline başarıyla giriş yapıldı.', 'success');
+        showView('admin');
+      }
+
+      // -------------------------------------------------------------
+      // STAFF DASHBOARD LOGIC (DUPLICATE PREVENTION & STRICT TIME)
+      // -------------------------------------------------------------
+      function renderStaffDashboard() {
+        if (!state.currentUser || state.currentUser.role !== 'staff') return;
+        const staff = state.currentUser.data;
+        const now = getNowIstanbul();
+        const today = now.dateStr;
+
+        // Header and profile details
+        document.getElementById('staffDisplayName').textContent = `${staff.name} ${staff.surname}`;
+        document.getElementById('staffAvatarInitials').textContent = `${staff.name.charAt(0)}${staff.surname.charAt(0)}`.toUpperCase();
+        document.getElementById('staffDepartmentDisplay').textContent = staff.department;
+        document.getElementById('staffTcMasked').textContent = `T.C: *******${staff.tc.slice(-4)}`;
+
+        // Find today's attendance record for this staff
+        const todayRecord = state.attendance.find(a => a.staffId === staff.id && a.date === today);
+
+        const btnIn = document.getElementById('btnClockIn');
+        const btnOut = document.getElementById('btnClockOut');
+        const inSubtext = document.getElementById('clockInBtnSubtext');
+        const outSubtext = document.getElementById('clockOutBtnSubtext');
+        const inBadge = document.getElementById('clockInDoneBadge');
+        const outBadge = document.getElementById('clockOutDoneBadge');
+        const statusBadge = document.getElementById('staffStatusBadge');
+
+        const inDisp = document.getElementById('todayCheckInDisplay');
+        const outDisp = document.getElementById('todayCheckOutDisplay');
+        const durDisp = document.getElementById('todayDurationDisplay');
+
+        // Reset badges
+        inBadge.classList.add('hidden');
+        outBadge.classList.add('hidden');
+
+        if (!todayRecord) {
+          // Has NOT checked in today
+          btnIn.disabled = false;
+          btnOut.disabled = true;
+          inSubtext.textContent = 'Giriş saatini kaydetmek için dokunun';
+          outSubtext.textContent = 'Önce işe giriş yapmalısınız';
+          statusBadge.textContent = 'Henüz Giriş Yapılmadı';
+          statusBadge.className = 'text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600';
+          inDisp.textContent = '--:--';
+          outDisp.textContent = '--:--';
+          durDisp.textContent = '0s 00d';
+        } else if (todayRecord.checkIn && !todayRecord.checkOut) {
+          // Checked in, NOT checked out (Currently working)
+          btnIn.disabled = true;
+          btnOut.disabled = false;
+          inSubtext.textContent = `Bugün saat ${todayRecord.checkIn}'de giriş yapıldı`;
+          inBadge.classList.remove('hidden');
+          document.getElementById('clockInDoneTime').textContent = `Giriş: ${todayRecord.checkIn}`;
+          outSubtext.textContent = 'Çıkış saatini kaydetmek için dokunun';
+          statusBadge.textContent = `Mesaide (${todayRecord.checkIn}'den beri)`;
+          statusBadge.className = 'text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 animate-pulse';
+          inDisp.textContent = todayRecord.checkIn;
+          outDisp.textContent = '--:--';
+
+          const currentMinutes = calculateMinutesBetween(todayRecord.checkIn, now.timeStr);
+          durDisp.textContent = formatMinutesToHours(currentMinutes);
+        } else if (todayRecord.checkIn && todayRecord.checkOut) {
+          // Completed day
+          btnIn.disabled = true;
+          btnOut.disabled = true;
+          inSubtext.textContent = `Bugün saat ${todayRecord.checkIn}'de giriş yapıldı`;
+          inBadge.classList.remove('hidden');
+          document.getElementById('clockInDoneTime').textContent = `Giriş: ${todayRecord.checkIn}`;
+          outSubtext.textContent = `Bugün saat ${todayRecord.checkOut}'de çıkış yapıldı`;
+          outBadge.classList.remove('hidden');
+          document.getElementById('clockOutDoneTime').textContent = `Çıkış: ${todayRecord.checkOut}`;
+          statusBadge.textContent = 'Günü Tamamladı';
+          statusBadge.className = 'text-xs font-semibold px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-800';
+          inDisp.textContent = todayRecord.checkIn;
+          outDisp.textContent = todayRecord.checkOut;
+          durDisp.textContent = formatMinutesToHours(todayRecord.durationMinutes);
+        }
+
+        renderStaffHistoryTable(staff.id);
+      }
+
+      async function handleStaffClockIn() {
+        if (!state.currentUser || state.currentUser.role !== 'staff') return;
+        const staff = state.currentUser.data;
+        const now = getNowIstanbul();
+        const today = now.dateStr;
+
+        // STRICT DUPLICATE CHECK: Verify if already checked in today
+        const existing = state.attendance.find(a => a.staffId === staff.id && a.date === today);
+        if (existing && existing.checkIn) {
+          showToast(`Bugün saat ${existing.checkIn}'de zaten işe giriş kaydınız alınmıştır. Mükerrer kayıt engellendi.`, 'warning');
+          return;
+        }
+
+        const newRecord = {
+          id: 'att_' + Date.now(),
+          staffId: staff.id,
+          date: today,
+          checkIn: now.timeStr,
+          checkOut: null,
+          durationMinutes: 0,
+          status: 'Mesaide',
+          notes: 'Mobil/Web üzerinden giriş yapıldı.',
+          updatedBy: null,
+          updatedAt: null
+        };
+
+        state.attendance.unshift(newRecord);
+        await saveState();
+
+        showToast(`✅ İşe girişiniz başarıyla kaydedildi! Saat: ${now.timeStr}`, 'success');
+        renderStaffDashboard();
+      }
+
+      async function handleStaffClockOut() {
+        if (!state.currentUser || state.currentUser.role !== 'staff') return;
+        const staff = state.currentUser.data;
+        const now = getNowIstanbul();
+        const today = now.dateStr;
+
+        const record = state.attendance.find(a => a.staffId === staff.id && a.date === today);
+        if (!record || !record.checkIn) {
+          showToast('Önce işe giriş kaydınızı yapmanız gerekmektedir!', 'error');
+          return;
+        }
+
+        // STRICT DUPLICATE CHECK: Verify if already checked out today
+        if (record.checkOut) {
+          showToast(`Bugün saat ${record.checkOut}'de zaten çıkış kaydınız alınmıştır. Mükerrer kayıt engellendi.`, 'warning');
+          return;
+        }
+
+        record.checkOut = now.timeStr;
+        record.durationMinutes = calculateMinutesBetween(record.checkIn, record.checkOut);
+        record.status = 'Tamamlandı';
+        record.notes = (record.notes ? record.notes + ' ' : '') + `Çıkış: ${now.timeStr}`;
+
+        await saveState();
+
+        showToast(`🏁 İşten çıkışınız kaydedildi! Toplam mesai: ${formatMinutesToHours(record.durationMinutes)}`, 'success');
+        renderStaffDashboard();
+      }
+
+      function renderStaffHistoryTable(staffId) {
+        const tbody = document.getElementById('staffHistoryTableBody');
+        const filterVal = document.getElementById('staffHistoryFilter').value;
+        tbody.innerHTML = '';
+
+        // Strict isolation: only records belonging to this staffId
+        let records = state.attendance.filter(a => a.staffId === staffId);
+
+        // Date sorting descending
+        records.sort((a, b) => b.date.localeCompare(a.date));
+
+        const now = getNowIstanbul();
+        const currentYearMonth = now.dateStr.slice(0, 7); // YYYY-MM
+
+        if (filterVal === 'this-month') {
+          records = records.filter(r => r.date.startsWith(currentYearMonth));
+        } else if (filterVal === 'last-month') {
+          const d = new Date(now.raw.getFullYear(), now.raw.getMonth() - 1, 1);
+          const lastYm = `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}`;
+          records = records.filter(r => r.date.startsWith(lastYm));
+        }
+
+        if (records.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="6" class="px-6 py-8 text-center text-slate-400 text-xs">
+                Seçilen döneme ait herhangi bir puantaj kaydınız bulunmamaktadır.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        records.forEach(r => {
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-slate-50 transition-colors';
+
+          let statusBadge = '';
+          if (r.status === 'Tamamlandı') {
+            statusBadge = '<span class="px-2 py-0.5 rounded-full text-[11px] bg-emerald-100 text-emerald-800">Tamamlandı</span>';
+          } else if (r.status === 'Mesaide') {
+            statusBadge = '<span class="px-2 py-0.5 rounded-full text-[11px] bg-indigo-100 text-indigo-800 animate-pulse">Mesaide</span>';
+          } else if (r.status === 'Düzeltildi') {
+            statusBadge = '<span class="px-2 py-0.5 rounded-full text-[11px] bg-purple-100 text-purple-800">Yönetici Düzeltmesi</span>';
+          } else {
+            statusBadge = `<span class="px-2 py-0.5 rounded-full text-[11px] bg-amber-100 text-amber-800">${escapeHtml(r.status)}</span>`;
+          }
+
+          tr.innerHTML = `
+            <td class="px-6 py-4 font-mono font-medium text-slate-900">${escapeHtml(r.date)}</td>
+            <td class="px-6 py-4 font-mono text-emerald-600 font-bold">${r.checkIn || '--:--'}</td>
+            <td class="px-6 py-4 font-mono text-rose-600 font-bold">${r.checkOut || '--:--'}</td>
+            <td class="px-6 py-4 font-mono text-slate-700">${formatMinutesToHours(r.durationMinutes)}</td>
+            <td class="px-6 py-4">${statusBadge}</td>
+            <td class="px-6 py-4 text-xs text-slate-500 max-w-xs truncate">${escapeHtml(r.notes || '-')}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      // -------------------------------------------------------------
+      // ADMIN DASHBOARD LOGIC (STAFF MANAGEMENT, EDIT, CSV, AUDIT)
+      // -------------------------------------------------------------
+      function renderAdminDashboard() {
+        if (!state.currentUser || state.currentUser.role !== 'admin') return;
+        renderAdminMetrics();
+        populateAdminStaffFilter();
+        renderAdminPuantajTable();
+        renderAdminStaffTable();
+        renderAdminReports();
+        renderAdminAuditTable();
+        renderNotificationLogs();
+        checkPushCapability();
+      }
+
+      function renderAdminMetrics() {
+        const totalStaff = state.staffList.length;
+        document.getElementById('metricTotalStaff').textContent = totalStaff;
+        document.getElementById('staffCapacityBadge').textContent = `${totalStaff} / ${MAX_STAFF_LIMIT}`;
+
+        const quotaPercent = Math.min(100, Math.round((totalStaff / MAX_STAFF_LIMIT) * 100));
+        document.getElementById('staffQuotaBar').style.width = `${quotaPercent}%`;
+
+        const today = getNowIstanbul().dateStr;
+        const todayRecords = state.attendance.filter(a => a.date === today);
+
+        const activeToday = todayRecords.filter(a => a.checkIn).length;
+        document.getElementById('metricActiveToday').textContent = activeToday;
+
+        const currentlyWorking = todayRecords.filter(a => a.checkIn && !a.checkOut).length;
+        document.getElementById('metricCurrentlyWorking').textContent = currentlyWorking;
+
+        const missing = state.attendance.filter(a => (a.checkIn && !a.checkOut && a.date !== today) || a.status === 'Eksik Kayıt').length;
+        document.getElementById('metricMissingRecords').textContent = missing;
+
+        // Total hours this month
+        const thisMonthStr = today.slice(0, 7);
+        const totalMinutesThisMonth = state.attendance
+          .filter(a => a.date.startsWith(thisMonthStr))
+          .reduce((acc, curr) => acc + (curr.durationMinutes || 0), 0);
+        const totalHours = Math.round(totalMinutesThisMonth / 60);
+        document.getElementById('metricTotalHoursThisMonth').textContent = totalHours;
+      }
+
+      function populateAdminStaffFilter() {
+        const select = document.getElementById('filterStaffSelect');
+        const currentVal = select.value;
+        select.innerHTML = '<option value="all">Tüm Personeller</option>';
+        state.staffList.forEach(s => {
+          const opt = document.createElement('option');
+          opt.value = s.id;
+          opt.textContent = `${s.name} ${s.surname} (${s.department})`;
+          select.appendChild(opt);
+        });
+        select.value = currentVal;
+      }
+
+      function renderAdminPuantajTable() {
+        const tbody = document.getElementById('adminPuantajTableBody');
+        const emptyNotice = document.getElementById('adminPuantajEmptyNotice');
+        tbody.innerHTML = '';
+
+        const start = document.getElementById('filterDateStart').value;
+        const end = document.getElementById('filterDateEnd').value;
+        const staffFilter = document.getElementById('filterStaffSelect').value;
+        const statusFilter = document.getElementById('filterStatusSelect').value;
+
+        let filtered = [...state.attendance];
+
+        if (start) {
+          filtered = filtered.filter(a => a.date >= start);
+        }
+        if (end) {
+          filtered = filtered.filter(a => a.date <= end);
+        }
+        if (staffFilter !== 'all') {
+          filtered = filtered.filter(a => a.staffId === staffFilter);
+        }
+        if (statusFilter !== 'all') {
+          if (statusFilter === 'tamamlandi') filtered = filtered.filter(a => a.status === 'Tamamlandı');
+          if (statusFilter === 'mesaide') filtered = filtered.filter(a => a.status === 'Mesaide');
+          if (statusFilter === 'eksik') filtered = filtered.filter(a => a.status === 'Eksik Kayıt' || (!a.checkOut && a.date !== getNowIstanbul().dateStr));
+          if (statusFilter === 'duzeltildi') filtered = filtered.filter(a => a.status === 'Düzeltildi' || a.updatedBy);
+        }
+
+        // Sort by date descending, then checkIn descending
+        filtered.sort((a, b) => b.date.localeCompare(a.date));
+
+        if (filtered.length === 0) {
+          emptyNotice.classList.remove('hidden');
+          return;
+        }
+        emptyNotice.classList.add('hidden');
+
+        filtered.forEach(record => {
+          const staff = state.staffList.find(s => s.id === record.staffId) || { name: 'Bilinmeyen', surname: 'Personel', tc: '-----------', department: '-' };
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-slate-50/80 transition-colors';
+
+          let statusBadge = '';
+          if (record.status === 'Tamamlandı') {
+            statusBadge = '<span class="px-2 py-0.5 rounded-full text-[11px] bg-emerald-100 text-emerald-800">Tamamlandı</span>';
+          } else if (record.status === 'Mesaide') {
+            statusBadge = '<span class="px-2 py-0.5 rounded-full text-[11px] bg-indigo-100 text-indigo-800 animate-pulse">Mesaide</span>';
+          } else if (record.status === 'Düzeltildi' || record.updatedBy) {
+            statusBadge = '<span class="px-2 py-0.5 rounded-full text-[11px] bg-purple-100 text-purple-800" title="Yönetici Tarafından Düzeltildi">Düzeltildi</span>';
+          } else {
+            statusBadge = `<span class="px-2 py-0.5 rounded-full text-[11px] bg-amber-100 text-amber-800">${escapeHtml(record.status)}</span>`;
+          }
+
+          tr.innerHTML = `
+            <td class="px-5 py-3.5 font-mono font-medium text-slate-900">${escapeHtml(record.date)}</td>
+            <td class="px-5 py-3.5 font-semibold text-slate-800">${escapeHtml(staff.name + ' ' + staff.surname)}</td>
+            <td class="px-5 py-3.5 font-mono text-xs text-slate-400">*******${staff.tc.slice(-4)}</td>
+            <td class="px-5 py-3.5 text-xs text-slate-500">${escapeHtml(staff.department)}</td>
+            <td class="px-5 py-3.5 font-mono text-emerald-600 font-bold">${record.checkIn || '--:--'}</td>
+            <td class="px-5 py-3.5 font-mono text-rose-600 font-bold">${record.checkOut || '--:--'}</td>
+            <td class="px-5 py-3.5 font-mono text-slate-700 font-medium">${formatMinutesToHours(record.durationMinutes)}</td>
+            <td class="px-5 py-3.5">${statusBadge}</td>
+            <td class="px-5 py-3.5 text-right whitespace-nowrap">
+              <button data-action="editRecord" data-id="${record.id}" class="px-2.5 py-1 text-xs font-semibold text-brand-600 hover:text-brand-800 hover:bg-brand-50 rounded-lg transition-colors">
+                Düzenle
+              </button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        // Delegate edit record click
+        tbody.querySelectorAll('[data-action="editRecord"]').forEach(btn => {
+          btn.onclick = () => openEditRecordModal(btn.getAttribute('data-id'));
+        });
+      }
+
+      function openEditRecordModal(recordId) {
+        const record = state.attendance.find(a => a.id === recordId);
+        if (!record) return;
+        const staff = state.staffList.find(s => s.id === record.staffId) || { name: 'Personel', surname: '' };
+
+        const formHtml = `
+          <div class="space-y-4">
+            <div class="p-3 bg-slate-50 rounded-xl text-xs text-slate-600 border border-slate-200">
+              <p><strong>Personel:</strong> ${escapeHtml(staff.name + ' ' + staff.surname)}</p>
+              <p><strong>Puantaj Tarihi:</strong> ${escapeHtml(record.date)}</p>
+              <p><strong>Mevcut Giriş / Çıkış:</strong> ${record.checkIn || '--:--'} / ${record.checkOut || '--:--'}</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label for="editRecordCheckIn" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Giriş Saati</label>
+                <input type="time" id="editRecordCheckIn" value="${record.checkIn || ''}" class="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono text-sm outline-none focus:ring-2 focus:ring-brand-500">
+              </div>
+              <div>
+                <label for="editRecordCheckOut" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Çıkış Saati</label>
+                <input type="time" id="editRecordCheckOut" value="${record.checkOut || ''}" class="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono text-sm outline-none focus:ring-2 focus:ring-brand-500">
+              </div>
+            </div>
+
+            <div>
+              <label for="editRecordStatus" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Kayıt Durumu</label>
+              <select id="editRecordStatus" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-medium outline-none focus:ring-2 focus:ring-brand-500">
+                <option value="Düzeltildi" ${record.status === 'Düzeltildi' ? 'selected' : ''}>Düzeltildi</option>
+                <option value="Tamamlandı" ${record.status === 'Tamamlandı' ? 'selected' : ''}>Tamamlandı</option>
+                <option value="Eksik Kayıt" ${record.status === 'Eksik Kayıt' ? 'selected' : ''}>Eksik Kayıt</option>
+                <option value="Mesaide" ${record.status === 'Mesaide' ? 'selected' : ''}>Mesaide</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="editRecordReason" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Düzeltme Gerekçesi (Zorunlu Denetim İzi)</label>
+              <textarea id="editRecordReason" rows="2" placeholder="Örn: Personel kartını okutmayı unuttuğunu bildirdi, kamera kaydı incelendi." class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs outline-none focus:ring-2 focus:ring-brand-500" required></textarea>
+              <p class="text-[11px] text-slate-400 mt-1">Bu düzeltme önceki değerleri ve yöneticinizin adı ile denetim günlüğüne kaydedilecektir.</p>
+            </div>
+          </div>
+        `;
+
+        openModal('Puantaj Kaydını Düzenle', formHtml, async () => {
+          const newIn = document.getElementById('editRecordCheckIn').value;
+          const newOut = document.getElementById('editRecordCheckOut').value;
+          const newStatus = document.getElementById('editRecordStatus').value;
+          const reason = document.getElementById('editRecordReason').value.trim();
+
+          if (!reason) {
+            showToast('Lütfen denetim izi için bir düzeltme gerekçesi giriniz!', 'warning');
+            return false;
+          }
+
+          const oldSummary = `Giriş: ${record.checkIn || '--:--'}, Çıkış: ${record.checkOut || '--:--'}, Durum: ${record.status}`;
+          const newSummary = `Giriş: ${newIn || '--:--'}, Çıkış: ${newOut || '--:--'}, Durum: ${newStatus}`;
+
+          // Update record
+          record.checkIn = newIn || null;
+          record.checkOut = newOut || null;
+          record.durationMinutes = (newIn && newOut) ? calculateMinutesBetween(newIn, newOut) : 0;
+          record.status = newStatus;
+          record.updatedBy = state.adminUser.displayName;
+          record.updatedAt = getNowIstanbul().fullStr;
+
+          // Append to audit log
+          state.auditLogs.unshift({
+            id: 'aud_' + Date.now(),
+            timestamp: getNowIstanbul().fullStr,
+            adminName: state.adminUser.displayName,
+            staffName: `${staff.name} ${staff.surname}`,
+            recordDate: record.date,
+            field: 'Puantaj Saat & Durum',
+            oldValue: oldSummary,
+            newValue: newSummary,
+            reason: reason
+          });
+
+          await saveState();
+          showToast('Puantaj kaydı ve denetim izi başarıyla güncellendi.', 'success');
+          renderAdminMetrics();
+          renderAdminPuantajTable();
+          renderAdminAuditTable();
+          renderAdminReports();
+          return true;
+        }, 'Değişiklikleri Kaydet');
+      }
+
+      function openManualEntryModal() {
+        if (state.staffList.length === 0) {
+          showToast('Önce personel eklemeniz gerekmektedir!', 'warning');
+          return;
+        }
+
+        const staffOptions = state.staffList.map(s => `
+          <option value="${s.id}">${escapeHtml(s.name + ' ' + s.surname)} (${escapeHtml(s.department)})</option>
+        `).join('');
+
+        const today = getNowIstanbul().dateStr;
+
+        const formHtml = `
+          <div class="space-y-4">
+            <div>
+              <label for="manualStaffId" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Personel Seçiniz</label>
+              <select id="manualStaffId" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-medium outline-none focus:ring-2 focus:ring-brand-500">
+                ${staffOptions}
+              </select>
+            </div>
+
+            <div>
+              <label for="manualDate" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Puantaj Tarihi</label>
+              <input type="date" id="manualDate" value="${today}" class="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono text-xs outline-none focus:ring-2 focus:ring-brand-500">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label for="manualCheckIn" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Giriş Saati</label>
+                <input type="time" id="manualCheckIn" value="08:30" class="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono text-sm outline-none focus:ring-2 focus:ring-brand-500">
+              </div>
+              <div>
+                <label for="manualCheckOut" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Çıkış Saati</label>
+                <input type="time" id="manualCheckOut" value="18:30" class="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono text-sm outline-none focus:ring-2 focus:ring-brand-500">
+              </div>
+            </div>
+
+            <div>
+              <label for="manualReason" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Kayıt Ekleme Gerekçesi</label>
+              <input type="text" id="manualReason" placeholder="Örn: Manuel mesai girişi" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs outline-none focus:ring-2 focus:ring-brand-500" required>
+            </div>
+          </div>
+        `;
+
+        openModal('Yeni Manuel Puantaj Kaydı Ekle', formHtml, async () => {
+          const staffId = document.getElementById('manualStaffId').value;
+          const date = document.getElementById('manualDate').value;
+          const checkIn = document.getElementById('manualCheckIn').value;
+          const checkOut = document.getElementById('manualCheckOut').value;
+          const reason = document.getElementById('manualReason').value.trim();
+
+          if (!date || !checkIn) {
+            showToast('Tarih ve Giriş Saati zorunludur.', 'warning');
+            return false;
+          }
+
+          // Check if record already exists for this staff and date
+          const existing = state.attendance.find(a => a.staffId === staffId && a.date === date);
+          if (existing) {
+            showToast('Bu personelin seçilen tarihte zaten bir kaydı var! Lütfen var olan kaydı düzenleyin.', 'error');
+            return false;
+          }
+
+          const staff = state.staffList.find(s => s.id === staffId);
+          const duration = (checkIn && checkOut) ? calculateMinutesBetween(checkIn, checkOut) : 0;
+
+          const newRecord = {
+            id: 'att_' + Date.now(),
+            staffId: staffId,
+            date: date,
+            checkIn: checkIn,
+            checkOut: checkOut || null,
+            durationMinutes: duration,
+            status: 'Düzeltildi',
+            notes: `Manuel eklendi: ${reason || 'Yönetici Girişi'}`,
+            updatedBy: state.adminUser.displayName,
+            updatedAt: getNowIstanbul().fullStr
+          };
+
+          state.attendance.unshift(newRecord);
+
+          // Audit log
+          state.auditLogs.unshift({
+            id: 'aud_' + Date.now(),
+            timestamp: getNowIstanbul().fullStr,
+            adminName: state.adminUser.displayName,
+            staffName: `${staff.name} ${staff.surname}`,
+            recordDate: date,
+            field: 'Manuel Yeni Kayıt',
+            oldValue: 'Kayıt Yok',
+            newValue: `Giriş: ${checkIn}, Çıkış: ${checkOut || '--:--'}`,
+            reason: reason || 'Manuel yönetici girişi'
+          });
+
+          await saveState();
+          showToast('Manuel puantaj kaydı başarıyla eklendi.', 'success');
+          renderAdminMetrics();
+          renderAdminPuantajTable();
+          renderAdminAuditTable();
+          renderAdminReports();
+          return true;
+        }, 'Kaydı Oluştur');
+      }
+
+      // -------------------------------------------------------------
+      // STAFF MANAGEMENT (MAX 100 STAFF LIMIT ENFORCED)
+      // -------------------------------------------------------------
+      function renderAdminStaffTable() {
+        const tbody = document.getElementById('adminStaffTableBody');
+        tbody.innerHTML = '';
+
+        state.staffList.forEach(staff => {
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-slate-50/80 transition-colors';
+
+          const activeBadge = staff.active
+            ? '<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">Aktif</span>'
+            : '<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-500">Pasif</span>';
+
+          tr.innerHTML = `
+            <td class="px-6 py-4">
+              <div class="font-bold text-slate-900">${escapeHtml(staff.name + ' ' + staff.surname)}</div>
+              <div class="text-[11px] text-slate-400">Kayıt: ${escapeHtml(staff.createdAt)}</div>
+            </td>
+            <td class="px-6 py-4 font-mono font-medium text-slate-700">${escapeHtml(staff.tc)}</td>
+            <td class="px-6 py-4 text-xs font-medium text-slate-600">${escapeHtml(staff.department)}</td>
+            <td class="px-6 py-4 text-xs text-slate-500">T.C. & 4 Haneli PIN (Şifrelenmiş)</td>
+            <td class="px-6 py-4">${activeBadge}</td>
+            <td class="px-6 py-4 text-right space-x-2 whitespace-nowrap">
+              <button data-action="toggleStaffActive" data-id="${staff.id}" class="px-2.5 py-1 text-xs font-semibold ${staff.active ? 'text-amber-600 hover:bg-amber-50' : 'text-emerald-600 hover:bg-emerald-50'} rounded-lg transition-colors">
+                ${staff.active ? 'Pasife Al' : 'Aktif Et'}
+              </button>
+              <button data-action="resetStaffPin" data-id="${staff.id}" class="px-2.5 py-1 text-xs font-semibold text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
+                PIN Değiştir
+              </button>
+              <button data-action="editStaff" data-id="${staff.id}" class="px-2.5 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">
+                Düzenle
+              </button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        // Delegate handlers
+        tbody.querySelectorAll('[data-action="toggleStaffActive"]').forEach(btn => {
+          btn.onclick = () => toggleStaffActive(btn.getAttribute('data-id'));
+        });
+        tbody.querySelectorAll('[data-action="resetStaffPin"]').forEach(btn => {
+          btn.onclick = () => openResetPinModal(btn.getAttribute('data-id'));
+        });
+        tbody.querySelectorAll('[data-action="editStaff"]').forEach(btn => {
+          btn.onclick = () => openEditStaffModal(btn.getAttribute('data-id'));
+        });
+      }
+
+      function openAddStaffModal() {
+        // STRICT 100 STAFF LIMIT CHECK
+        if (state.staffList.length >= MAX_STAFF_LIMIT) {
+          showToast(`Şirket personel kapasitesi olan maksimum ${MAX_STAFF_LIMIT} kişiye ulaşılmıştır. Yeni personel ekleyemezsiniz.`, 'error', 6000);
+          return;
+        }
+
+        const formHtml = `
+          <div class="space-y-4">
+            <div class="p-3 bg-brand-50 rounded-xl text-xs text-brand-800">
+              Kullanılan Kota: <strong>${state.staffList.length} / ${MAX_STAFF_LIMIT} Personel</strong>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label for="newStaffName" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Adı</label>
+                <input type="text" id="newStaffName" placeholder="Örn: Burak" required class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs outline-none focus:ring-2 focus:ring-brand-500">
+              </div>
+              <div>
+                <label for="newStaffSurname" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Soyadı</label>
+                <input type="text" id="newStaffSurname" placeholder="Örn: Aydın" required class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs outline-none focus:ring-2 focus:ring-brand-500">
+              </div>
+            </div>
+
+            <div>
+              <label for="newStaffTc" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">T.C. Kimlik Numarası (11 Hane)</label>
+              <input type="text" id="newStaffTc" maxlength="11" pattern="\\d{11}" placeholder="11 haneli T.C." required inputmode="numeric" class="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono text-sm outline-none focus:ring-2 focus:ring-brand-500">
+            </div>
+
+            <div>
+              <label for="newStaffDepartment" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Departman</label>
+              <select id="newStaffDepartment" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs outline-none focus:ring-2 focus:ring-brand-500">
+                <option value="Yazılım & Bilişim">Yazılım & Bilişim</option>
+                <option value="Muhasebe & Finans">Muhasebe & Finans</option>
+                <option value="İnsan Kaynakları">İnsan Kaynakları</option>
+                <option value="Pazarlama & Satış">Pazarlama & Satış</option>
+                <option value="Lojistik & Depo">Lojistik & Depo</option>
+                <option value="Üretim & İmalat">Üretim & İmalat</option>
+                <option value="Genel Yönetim">Genel Yönetim</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="newStaffPin" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">4 Haneli Giriş PIN Kodu</label>
+              <input type="password" id="newStaffPin" maxlength="4" pattern="\\d{4}" placeholder="••••" required inputmode="numeric" class="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono text-center text-lg outline-none focus:ring-2 focus:ring-brand-500">
+              <p class="text-[11px] text-slate-400 mt-1">PIN kodu güvenli biçimde SHA-256 olarak şifrelenir ve asla düz metin olarak saklanmaz.</p>
+            </div>
+          </div>
+        `;
+
+        openModal('Yeni Personel Tanımla (Maks 100)', formHtml, async () => {
+          const name = document.getElementById('newStaffName').value.trim();
+          const surname = document.getElementById('newStaffSurname').value.trim();
+          const tc = document.getElementById('newStaffTc').value.trim();
+          const department = document.getElementById('newStaffDepartment').value;
+          const pin = document.getElementById('newStaffPin').value.trim();
+
+          if (!name || !surname) {
+            showToast('Ad ve soyad zorunludur.', 'warning');
+            return false;
+          }
+          if (!/^\d{11}$/.test(tc)) {
+            showToast('T.C. Kimlik numarası 11 haneli rakam olmalıdır.', 'warning');
+            return false;
+          }
+          if (!/^\d{4}$/.test(pin)) {
+            showToast('PIN kodu 4 haneli rakam olmalıdır.', 'warning');
+            return false;
+          }
+
+          // Check duplicate TC
+          if (state.staffList.some(s => s.tc === tc)) {
+            showToast('Bu T.C. Kimlik numarasıyla zaten bir personel kayıtlı!', 'error');
+            return false;
+          }
+
+          const pinHash = await sha256(pin);
+          const newStaff = {
+            id: 'stf_' + Date.now(),
+            tc: tc,
+            pinHash: pinHash,
+            name: name,
+            surname: surname,
+            department: department,
+            active: true,
+            createdAt: getNowIstanbul().dateStr
+          };
+
+          state.staffList.push(newStaff);
+
+          state.auditLogs.unshift({
+            id: 'aud_' + Date.now(),
+            timestamp: getNowIstanbul().fullStr,
+            adminName: state.adminUser.displayName,
+            staffName: `${name} ${surname}`,
+            recordDate: getNowIstanbul().dateStr,
+            field: 'Personel Hesabı',
+            oldValue: 'Yok',
+            newValue: `T.C: ${tc}, Dep: ${department}`,
+            reason: 'Yönetici tarafından yeni personel hesabı oluşturuldu.'
+          });
+
+          await saveState();
+          showToast(`Personel ${name} ${surname} başarıyla kaydedildi.`, 'success');
+          renderAdminMetrics();
+          renderAdminStaffTable();
+          populateAdminStaffFilter();
+          return true;
+        }, 'Personeli Kaydet');
+      }
+
+      function openEditStaffModal(staffId) {
+        const staff = state.staffList.find(s => s.id === staffId);
+        if (!staff) return;
+
+        const formHtml = `
+          <div class="space-y-4">
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label for="editStaffName" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Adı</label>
+                <input type="text" id="editStaffName" value="${escapeHtml(staff.name)}" required class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs outline-none focus:ring-2 focus:ring-brand-500">
+              </div>
+              <div>
+                <label for="editStaffSurname" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Soyadı</label>
+                <input type="text" id="editStaffSurname" value="${escapeHtml(staff.surname)}" required class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs outline-none focus:ring-2 focus:ring-brand-500">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">T.C. Kimlik Numarası</label>
+              <input type="text" disabled value="${escapeHtml(staff.tc)}" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-100 font-mono text-xs text-slate-500">
+              <p class="text-[10px] text-slate-400 mt-0.5">T.C. Kimlik numarası güvenlik nedeniyle sonradan değiştirilemez.</p>
+            </div>
+
+            <div>
+              <label for="editStaffDepartment" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Departman</label>
+              <input type="text" id="editStaffDepartment" value="${escapeHtml(staff.department)}" required class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs outline-none focus:ring-2 focus:ring-brand-500">
+            </div>
+
+            <div>
+              <label for="editStaffActive" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Durum</label>
+              <select id="editStaffActive" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs outline-none focus:ring-2 focus:ring-brand-500">
+                <option value="true" ${staff.active ? 'selected' : ''}>Aktif</option>
+                <option value="false" ${!staff.active ? 'selected' : ''}>Pasif</option>
+              </select>
+            </div>
+          </div>
+        `;
+
+        openModal('Personel Bilgilerini Düzenle', formHtml, async () => {
+          const name = document.getElementById('editStaffName').value.trim();
+          const surname = document.getElementById('editStaffSurname').value.trim();
+          const department = document.getElementById('editStaffDepartment').value.trim();
+          const active = document.getElementById('editStaffActive').value === 'true';
+
+          if (!name || !surname) {
+            showToast('Ad ve soyad zorunludur.', 'warning');
+            return false;
+          }
+
+          staff.name = name;
+          staff.surname = surname;
+          staff.department = department;
+          staff.active = active;
+
+          await saveState();
+          showToast('Personel bilgileri güncellendi.', 'success');
+          renderAdminStaffTable();
+          populateAdminStaffFilter();
+          return true;
+        }, 'Güncelle');
+      }
+
+      function openResetPinModal(staffId) {
+        const staff = state.staffList.find(s => s.id === staffId);
+        if (!staff) return;
+
+        const formHtml = `
+          <div class="space-y-4">
+            <p class="text-xs text-slate-600">
+              <strong>${escapeHtml(staff.name + ' ' + staff.surname)}</strong> için yeni bir 4 haneli PIN kodu belirleyin.
+            </p>
+            <div>
+              <label for="resetPinInput" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Yeni 4 Haneli PIN</label>
+              <input type="password" id="resetPinInput" maxlength="4" pattern="\\d{4}" placeholder="••••" required inputmode="numeric" class="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono text-center text-xl outline-none focus:ring-2 focus:ring-brand-500">
+            </div>
+          </div>
+        `;
+
+        openModal('PIN Sıfırla / Yeni PIN Ata', formHtml, async () => {
+          const newPin = document.getElementById('resetPinInput').value.trim();
+          if (!/^\d{4}$/.test(newPin)) {
+            showToast('PIN kodu tam 4 haneli rakam olmalıdır.', 'warning');
+            return false;
+          }
+
+          staff.pinHash = await sha256(newPin);
+
+          state.auditLogs.unshift({
+            id: 'aud_' + Date.now(),
+            timestamp: getNowIstanbul().fullStr,
+            adminName: state.adminUser.displayName,
+            staffName: `${staff.name} ${staff.surname}`,
+            recordDate: getNowIstanbul().dateStr,
+            field: 'PIN Kodu',
+            oldValue: 'Eski PIN (SHA-256)',
+            newValue: 'Yeni PIN Belirlendi (SHA-256)',
+            reason: 'Yönetici tarafından PIN sıfırlama işlemi yapıldı.'
+          });
+
+          await saveState();
+          showToast(`${staff.name} ${staff.surname} için yeni PIN başarıyla kaydedildi.`, 'success');
+          renderAdminAuditTable();
+          return true;
+        }, 'PIN Kodunu Güncelle');
+      }
+
+      async function toggleStaffActive(staffId) {
+        const staff = state.staffList.find(s => s.id === staffId);
+        if (!staff) return;
+
+        staff.active = !staff.active;
+        state.auditLogs.unshift({
+          id: 'aud_' + Date.now(),
+          timestamp: getNowIstanbul().fullStr,
+          adminName: state.adminUser.displayName,
+          staffName: `${staff.name} ${staff.surname}`,
+          recordDate: getNowIstanbul().dateStr,
+          field: 'Hesap Durumu',
+          oldValue: staff.active ? 'Pasif' : 'Aktif',
+          newValue: staff.active ? 'Aktif' : 'Pasif',
+          reason: staff.active ? 'Hesap yeniden aktifleştirildi.' : 'Personel hesabı geçici olarak pasife alındı.'
+        });
+
+        await saveState();
+        showToast(`${staff.name} ${staff.surname} durumu "${staff.active ? 'Aktif' : 'Pasif'}" olarak güncellendi.`, 'info');
+        renderAdminStaffTable();
+        renderAdminMetrics();
+        renderAdminAuditTable();
+      }
+
+      // -------------------------------------------------------------
+      // CSV EXPORT (EXCEL COMPATIBLE WITH UTF-8 BOM)
+      // -------------------------------------------------------------
+      function exportPuantajCsv() {
+        if (state.attendance.length === 0) {
+          showToast('Dışa aktarılacak puantaj verisi bulunmuyor.', 'warning');
+          return;
+        }
+
+        // Excel in Turkish locale uses semicolon ';' delimiter
+        const headers = ['Tarih', 'Personel Adi Soyadi', 'T.C. Kimlik No', 'Departman', 'Giris Saati', 'Cikis Saati', 'Toplam Calisma Suresi (Dk)', 'Calisma Suresi', 'Durum', 'Aciklama', 'Duzenleyen Yonetici', 'Duzenleme Zamani'];
+        
+        let csvContent = '\uFEFF'; // UTF-8 BOM for Excel
+        csvContent += headers.join(';') + '\r\n';
+
+        state.attendance.forEach(rec => {
+          const staff = state.staffList.find(s => s.id === rec.staffId) || { name: 'Bilinmeyen', surname: '', tc: '', department: '' };
+          const row = [
+            `"${rec.date}"`,
+            `"${staff.name} ${staff.surname}"`,
+            `"${staff.tc}"`,
+            `"${staff.department}"`,
+            `"${rec.checkIn || ''}"`,
+            `"${rec.checkOut || ''}"`,
+            rec.durationMinutes || 0,
+            `"${formatMinutesToHours(rec.durationMinutes)}"`,
+            `"${rec.status || ''}"`,
+            `"${(rec.notes || '').replace(/"/g, '""')}"`,
+            `"${rec.updatedBy || ''}"`,
+            `"${rec.updatedAt || ''}"`
+          ];
+          csvContent += row.join(';') + '\r\n';
+        });
+
+        downloadBlobFile(csvContent, `Personel_Puantaj_Listesi_${getNowIstanbul().dateStr}.csv`, 'text/csv;charset=utf-8;');
+        showToast('Puantaj tablosu Excel uyumlu CSV olarak indirildi.', 'success');
+      }
+
+      function exportMonthlyReportsCsv() {
+        const month = document.getElementById('reportMonthSelect').value || getNowIstanbul().dateStr.slice(0, 7);
+        const headers = ['Personel Adi Soyadi', 'Departman', 'Donem', 'Calisilan Gun Sayisi', 'Toplam Mesai Suresi', 'Toplam Dakika', 'Gunluk Ortalama Sure', 'Gec Giris Sayisi', 'Eksik Cikis Sayisi'];
+
+        let csvContent = '\uFEFF';
+        csvContent += headers.join(';') + '\r\n';
+
+        state.staffList.forEach(staff => {
+          const staffMonthRecords = state.attendance.filter(a => a.staffId === staff.id && a.date.startsWith(month));
+          const daysWorked = staffMonthRecords.filter(a => a.checkIn).length;
+          const totalMins = staffMonthRecords.reduce((acc, r) => acc + (r.durationMinutes || 0), 0);
+          const avgMins = daysWorked > 0 ? Math.round(totalMins / daysWorked) : 0;
+          const lateCount = staffMonthRecords.filter(a => a.status === 'Geç Giriş').length;
+          const missingCount = staffMonthRecords.filter(a => a.status === 'Eksik Kayıt' || (a.checkIn && !a.checkOut)).length;
+
+          const row = [
+            `"${staff.name} ${staff.surname}"`,
+            `"${staff.department}"`,
+            `"${month}"`,
+            daysWorked,
+            `"${formatMinutesToHours(totalMins)}"`,
+            totalMins,
+            `"${formatMinutesToHours(avgMins)}"`,
+            lateCount,
+            missingCount
+          ];
+          csvContent += row.join(';') + '\r\n';
+        });
+
+        downloadBlobFile(csvContent, `Aylik_Puantaj_Ozeti_${month}.csv`, 'text/csv;charset=utf-8;');
+        showToast('Aylık personel özet raporu Excel uyumlu CSV olarak indirildi.', 'success');
+      }
+
+      function downloadBlobFile(content, fileName, mimeType) {
+        const blob = new Blob([content], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+
+      // -------------------------------------------------------------
+      // MONTHLY REPORTS RENDER
+      // -------------------------------------------------------------
+      function renderAdminReports() {
+        const select = document.getElementById('reportMonthSelect');
+        const tbody = document.getElementById('adminReportsTableBody');
+        tbody.innerHTML = '';
+
+        // Collect available months from attendance
+        const monthsSet = new Set();
+        monthsSet.add(getNowIstanbul().dateStr.slice(0, 7));
+        state.attendance.forEach(a => monthsSet.add(a.date.slice(0, 7)));
+
+        const months = Array.from(monthsSet).sort().reverse();
+
+        if (select.children.length === 0) {
+          months.forEach(m => {
+            const opt = document.createElement('option');
+            opt.value = m;
+            const [y, mo] = m.split('-');
+            const dateObj = new Date(parseInt(y), parseInt(mo) - 1, 1);
+            opt.textContent = dateObj.toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' });
+            select.appendChild(opt);
+          });
+        }
+
+        const selectedMonth = select.value || months[0];
+
+        state.staffList.forEach(staff => {
+          const staffMonthRecords = state.attendance.filter(a => a.staffId === staff.id && a.date.startsWith(selectedMonth));
+          const daysWorked = staffMonthRecords.filter(a => a.checkIn).length;
+          const totalMins = staffMonthRecords.reduce((acc, r) => acc + (r.durationMinutes || 0), 0);
+          const avgMins = daysWorked > 0 ? Math.round(totalMins / daysWorked) : 0;
+          const lateCount = staffMonthRecords.filter(a => a.status === 'Geç Giriş').length;
+          const missingCount = staffMonthRecords.filter(a => a.status === 'Eksik Kayıt' || (a.checkIn && !a.checkOut)).length;
+
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-slate-50/80 transition-colors';
+          tr.innerHTML = `
+            <td class="px-6 py-4 font-bold text-slate-900">${escapeHtml(staff.name + ' ' + staff.surname)}</td>
+            <td class="px-6 py-4 text-xs text-slate-500">${escapeHtml(staff.department)}</td>
+            <td class="px-6 py-4 font-mono font-semibold text-slate-800">${daysWorked} gün</td>
+            <td class="px-6 py-4 font-mono font-bold text-brand-600">${formatMinutesToHours(totalMins)}</td>
+            <td class="px-6 py-4 font-mono text-slate-600">${formatMinutesToHours(avgMins)}</td>
+            <td class="px-6 py-4 font-mono text-amber-600">${lateCount} kez</td>
+            <td class="px-6 py-4 font-mono text-rose-600">${missingCount} eksik</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      // -------------------------------------------------------------
+      // AUDIT LOGS TABLE RENDER
+      // -------------------------------------------------------------
+      function renderAdminAuditTable() {
+        const tbody = document.getElementById('adminAuditTableBody');
+        const badge = document.getElementById('auditLogCountBadge');
+        tbody.innerHTML = '';
+
+        badge.textContent = `${state.auditLogs.length} İşlem Kayıtlı`;
+
+        if (state.auditLogs.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="7" class="px-6 py-8 text-center text-slate-400 text-xs">
+                Henüz herhangi bir yönetici düzeltmesi yapılmamış.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        state.auditLogs.forEach(log => {
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-slate-50 transition-colors';
+          tr.innerHTML = `
+            <td class="px-5 py-3 font-mono text-slate-500 whitespace-nowrap">${escapeHtml(log.timestamp)}</td>
+            <td class="px-5 py-3 font-semibold text-slate-800">${escapeHtml(log.adminName)}</td>
+            <td class="px-5 py-3 text-slate-700">${escapeHtml(log.staffName)}</td>
+            <td class="px-5 py-3 font-mono text-slate-600">${escapeHtml(log.recordDate)}</td>
+            <td class="px-5 py-3 font-mono text-rose-600 bg-rose-50/50 rounded">${escapeHtml(log.oldValue)}</td>
+            <td class="px-5 py-3 font-mono text-emerald-600 bg-emerald-50/50 rounded">${escapeHtml(log.newValue)}</td>
+            <td class="px-5 py-3 text-slate-600 italic">${escapeHtml(log.reason)}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      // -------------------------------------------------------------
+      // NOTIFICATIONS & WEB PUSH ARCHITECTURE
+      // -------------------------------------------------------------
+      function checkPushCapability() {
+        const badge = document.getElementById('pushSupportBadge');
+        const permText = document.getElementById('currentPermissionText');
+
+        if (!('Notification' in window)) {
+          badge.textContent = 'Desteklenmiyor';
+          badge.className = 'text-xs font-semibold px-2.5 py-1 rounded-full bg-rose-100 text-rose-800';
+          permText.textContent = 'Bu tarayıcıda Web Notifications API yok.';
+          return;
+        }
+
+        const perm = Notification.permission;
+        permText.textContent = perm === 'granted' ? 'İzin Verildi ✅' : (perm === 'denied' ? 'Reddedildi ❌' : 'İzin İstenmedi ⏳');
+
+        if (perm === 'granted') {
+          badge.textContent = 'Aktif & İzinli';
+          badge.className = 'text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800';
+        } else if (perm === 'denied') {
+          badge.textContent = 'İzin Reddedildi';
+          badge.className = 'text-xs font-semibold px-2.5 py-1 rounded-full bg-rose-100 text-rose-800';
+        } else {
+          badge.textContent = 'İzin Bekleniyor';
+          badge.className = 'text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-100 text-amber-800';
+        }
+      }
+
+      async function requestNotificationPermission() {
+        if (!('Notification' in window)) {
+          showToast('Tarayıcınız bildirim desteği sunmamaktadır.', 'error');
+          return;
+        }
+
+        try {
+          const perm = await Notification.requestPermission();
+          checkPushCapability();
+          if (perm === 'granted') {
+            showToast('Bildirim izni başarıyla verildi! Hatırlatmaları alacaksınız.', 'success');
+          } else {
+            showToast('Bildirim izni verilmedi.', 'warning');
+          }
+        } catch (e) {
+          showToast('Bildirim izni istenirken bir hata oluştu: ' + e.message, 'error');
+        }
+      }
+
+      function dispatchScheduledNotification(title, body, type = 'manual') {
+        const activeStaffCount = state.staffList.filter(s => s.active).length;
+
+        // Try local browser Notification if granted
+        if ('Notification' in window && Notification.permission === 'granted') {
+          try {
+            new Notification(title, {
+              body: body,
+              icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%234f46e5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>'
+            });
+          } catch (e) {
+            console.warn("Local notification creation error:", e);
+          }
+        }
+
+        // Always show in-app toast notification
+        showToast(`🔔 [ZAMANLANMIŞ BİLDİRİM] ${title}: ${body}`, 'info', 7000);
+
+        // Record in notification logs
+        state.notificationLogs.unshift({
+          id: 'notif_' + Date.now(),
+          timestamp: getNowIstanbul().fullStr,
+          title: title,
+          body: body,
+          targetCount: activeStaffCount,
+          status: 'Başarılı (Gönderildi)'
+        });
+
+        saveState();
+        renderNotificationLogs();
+      }
+
+      function renderNotificationLogs() {
+        const tbody = document.getElementById('notificationLogsTableBody');
+        const countText = document.getElementById('notificationLogCountText');
+        tbody.innerHTML = '';
+
+        countText.textContent = `${state.notificationLogs.length} bildirim kaydı`;
+
+        if (state.notificationLogs.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="5" class="px-6 py-6 text-center text-slate-400 text-xs">
+                Henüz gönderilmiş bildirim kaydı yok.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        state.notificationLogs.forEach(log => {
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-slate-50 transition-colors';
+          tr.innerHTML = `
+            <td class="px-6 py-3 font-mono text-slate-500 whitespace-nowrap">${escapeHtml(log.timestamp)}</td>
+            <td class="px-6 py-3 font-semibold text-slate-800">${escapeHtml(log.title)}</td>
+            <td class="px-6 py-3 text-slate-600">${escapeHtml(log.body)}</td>
+            <td class="px-6 py-3 font-mono text-slate-700">${log.targetCount} Personel</td>
+            <td class="px-6 py-3"><span class="px-2 py-0.5 rounded-full text-[11px] bg-emerald-100 text-emerald-800">${escapeHtml(log.status)}</span></td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      function openServerCodeModal() {
+        const modalContent = `
+          <div class="space-y-4 text-xs text-slate-700">
+            <p>
+              Uygulama kapalıyken 08:00 ve 18:30 Europe/Istanbul bildirimlerinin gerçek sunucudan fırlatılması için hazırlanmış Node.js cron ve web-push servisi:
+            </p>
+            <div class="bg-slate-900 text-slate-200 p-4 rounded-xl font-mono text-[11px] overflow-x-auto">
+<pre>// cron-worker.js (Sunucu Tarafı)
+const cron = require('node-cron');
+const webpush = require('web-push');
+
+// 1. VAPID Anahtarları (Ücretsiz)
+webpush.setVapidDetails(
+  'mailto:yonetici@sirket.com',
+  process.env.VAPID_PUBLIC_KEY,
+  process.env.VAPID_PRIVATE_KEY
+);
+
+// 2. Sabah 08:00 İşe Giriş Bildirimi (Europe/Istanbul)
+cron.schedule('0 8 * * *', async () => {
+  console.log('[TR 08:00] İşe giriş hatırlatması aktif personele gönderiliyor...');
+  await sendPushToActiveStaff({
+    title: 'İşe Giriş Hatırlatması',
+    body: 'Lütfen işe giriş kaydınızı yapın.'
+  });
+}, { timezone: 'Europe/Istanbul' });
+
+// 3. Akşam 18:30 İşten Çıkış Bildirimi (Europe/Istanbul)
+cron.schedule('30 18 * * *', async () => {
+  console.log('[TR 18:30] İşten çıkış hatırlatması aktif personele gönderiliyor...');
+  await sendPushToActiveStaff({
+    title: 'İşten Çıkış Hatırlatması',
+    body: 'Lütfen işten çıkış kaydınızı yapın.'
+  });
+}, { timezone: 'Europe/Istanbul' });</pre>
+            </div>
+            <p class="text-[11px] text-slate-500">
+              * Bu sunucu altyapısı, veritabanı şeması ve Dockerfile <code>artifacts/file_generation/ttl=63d/output/personel_puantaj_pro.zip</code> dosyası olarak paketlenmiştir.
+            </p>
+          </div>
+        `;
+        openModal('Üretim Ortamı Web Push & Cron Altyapısı', modalContent, null, '', 'Kapat');
+      }
+
+      // -------------------------------------------------------------
+      // EVENT LISTENERS & ATTACHMENTS
+      // -------------------------------------------------------------
+      function attachEvents() {
+        // Staff / Admin Login Tabs
+        const tabStaffBtn = document.getElementById('tabStaffBtn');
+        const tabAdminBtn = document.getElementById('tabAdminBtn');
+        const staffLoginForm = document.getElementById('staffLoginForm');
+        const adminLoginForm = document.getElementById('adminLoginForm');
+
+        tabStaffBtn.onclick = () => {
+          tabStaffBtn.className = 'py-2.5 rounded-lg bg-white text-brand-700 shadow-sm transition-all flex items-center justify-center gap-2';
+          tabAdminBtn.className = 'py-2.5 rounded-lg hover:text-slate-900 transition-all flex items-center justify-center gap-2';
+          staffLoginForm.classList.remove('hidden');
+          adminLoginForm.classList.add('hidden');
+        };
+
+        tabAdminBtn.onclick = () => {
+          tabAdminBtn.className = 'py-2.5 rounded-lg bg-white text-indigo-700 shadow-sm transition-all flex items-center justify-center gap-2';
+          tabStaffBtn.className = 'py-2.5 rounded-lg hover:text-slate-900 transition-all flex items-center justify-center gap-2';
+          adminLoginForm.classList.remove('hidden');
+          staffLoginForm.classList.add('hidden');
+        };
+
+        // Staff Login Form Submit
+        staffLoginForm.onsubmit = async (e) => {
+          e.preventDefault();
+          const tc = document.getElementById('staffTcInput').value.trim();
+          const pin = document.getElementById('staffPinInput').value.trim();
+          await handleStaffLogin(tc, pin);
+        };
+
+        // Admin Login Form Submit
+        adminLoginForm.onsubmit = async (e) => {
+          e.preventDefault();
+          const user = document.getElementById('adminUsernameInput').value.trim();
+          const pass = document.getElementById('adminPasswordInput').value;
+          await handleAdminLogin(user, pass);
+        };
+
+        // Quick Demo Buttons
+        document.getElementById('quickStaffDemoBtn').onclick = async () => {
+          document.getElementById('staffTcInput').value = '11111111110';
+          document.getElementById('staffPinInput').value = '1234';
+          await handleStaffLogin('11111111110', '1234');
+        };
+
+        document.getElementById('quickAdminDemoBtn').onclick = async () => {
+          document.getElementById('adminUsernameInput').value = 'admin';
+          document.getElementById('adminPasswordInput').value = 'admin123';
+          await handleAdminLogin('admin', 'admin123');
+        };
+
+        // Staff Clock In / Out
+        document.getElementById('btnClockIn').onclick = handleStaffClockIn;
+        document.getElementById('btnClockOut').onclick = handleStaffClockOut;
+
+        // Staff History Filter Change
+        document.getElementById('staffHistoryFilter').onchange = () => {
+          if (state.currentUser && state.currentUser.role === 'staff') {
+            renderStaffHistoryTable(state.currentUser.data.id);
+          }
+        };
+
+        // Admin Sub-tabs Navigation
+        const adminTabPuantajBtn = document.getElementById('adminTabPuantajBtn');
+        const adminTabStaffBtn = document.getElementById('adminTabStaffBtn');
+        const adminTabReportsBtn = document.getElementById('adminTabReportsBtn');
+        const adminTabAuditBtn = document.getElementById('adminTabAuditBtn');
+        const adminTabNotificationsBtn = document.getElementById('adminTabNotificationsBtn');
+
+        const panels = {
+          puantaj: document.getElementById('adminPanelPuantaj'),
+          staff: document.getElementById('adminPanelStaff'),
+          reports: document.getElementById('adminPanelReports'),
+          audit: document.getElementById('adminPanelAudit'),
+          notifications: document.getElementById('adminPanelNotifications')
+        };
+
+        const buttons = {
+          puantaj: adminTabPuantajBtn,
+          staff: adminTabStaffBtn,
+          reports: adminTabReportsBtn,
+          audit: adminTabAuditBtn,
+          notifications: adminTabNotificationsBtn
+        };
+
+        function switchAdminTab(target) {
+          Object.keys(panels).forEach(key => {
+            panels[key].classList.add('hidden');
+            buttons[key].className = 'py-3 px-3 sm:px-4 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300 whitespace-nowrap flex items-center gap-2';
+          });
+          panels[target].classList.remove('hidden');
+          buttons[target].className = 'py-3 px-3 sm:px-4 text-sm font-semibold border-b-2 border-brand-600 text-brand-600 whitespace-nowrap flex items-center gap-2';
+        }
+
+        adminTabPuantajBtn.onclick = () => switchAdminTab('puantaj');
+        adminTabStaffBtn.onclick = () => switchAdminTab('staff');
+        adminTabReportsBtn.onclick = () => switchAdminTab('reports');
+        adminTabAuditBtn.onclick = () => switchAdminTab('audit');
+        adminTabNotificationsBtn.onclick = () => switchAdminTab('notifications');
+
+        // Admin Filter Listeners
+        document.getElementById('filterDateStart').onchange = renderAdminPuantajTable;
+        document.getElementById('filterDateEnd').onchange = renderAdminPuantajTable;
+        document.getElementById('filterStaffSelect').onchange = renderAdminPuantajTable;
+        document.getElementById('filterStatusSelect').onchange = renderAdminPuantajTable;
+
+        // Admin Action Buttons
+        document.getElementById('btnOpenManualEntryModal').onclick = openManualEntryModal;
+        document.getElementById('btnExportPuantajCsv').onclick = exportPuantajCsv;
+        document.getElementById('btnOpenAddStaffModal').onclick = openAddStaffModal;
+        document.getElementById('reportMonthSelect').onchange = renderAdminReports;
+        document.getElementById('btnExportMonthlyReportCsv').onclick = exportMonthlyReportsCsv;
+
+        // Push Notification Listeners
+        document.getElementById('btnRequestNotificationPerm').onclick = requestNotificationPermission;
+        document.getElementById('btnTestMorningNotification').onclick = () => {
+          dispatchScheduledNotification('İşe Giriş Hatırlatması (Test)', 'Lütfen işe giriş kaydınızı yapın.', 'test');
+        };
+        document.getElementById('btnTestEveningNotification').onclick = () => {
+          dispatchScheduledNotification('İşten Çıkış Hatırlatması (Test)', 'Lütfen işten çıkış kaydınızı yapın.', 'test');
+        };
+        document.getElementById('btnShowServerCodeModal').onclick = openServerCodeModal;
+
+        // Factory Reset Button
+        document.getElementById('btnResetDemoData').onclick = () => {
+          openModal('Fabrika Ayarlarına Dön / Sıfırla', `
+            <p class="text-xs text-slate-600">
+              Bu işlem tüm yerel verileri sıfırlayacak ve başlangıç örnek personelleri ile puantaj verilerini yeniden yükleyecektir. Devam etmek istiyor musunuz?
+            </p>
+          `, async () => {
+            localStorage.removeItem(STORAGE_KEY);
+            await seedDefaultData();
+            showToast('Tüm veriler fabrika ayarlarına sıfırlandı.', 'info');
+            handleLogout();
+          }, 'Evet, Sıfırla');
+        };
+      }
+
+      // -------------------------------------------------------------
+      // APP BOOTSTRAP
+      // -------------------------------------------------------------
+      async function init() {
+        await initializeDatabase();
+        attachEvents();
+
+        // Start live clock
+        updateLiveClock();
+        setInterval(updateLiveClock, 1000);
+
+        // Check if admin exists
+        if (!state.adminUser) {
+          document.getElementById('firstRunSetupNotice').classList.remove('hidden');
+        }
+
+        // Show login view
+        showView('login');
+      }
+
+      // Run on DOM ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+
+    })();
+  </script>
+</body>
+</html>
