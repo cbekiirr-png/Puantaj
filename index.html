@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="tr" class="h-full bg-slate-50">
 <head>
@@ -68,7 +69,7 @@
       </div>
 
       <!-- Real-time Istanbul Clock -->
-      <div class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-slate-100 rounded-lg text-slate-700 text-xs font-medium border border-slate-200/80">
+      <div id="headerLiveClock" class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-slate-100 rounded-lg text-slate-700 text-xs font-medium border border-slate-200/80">
         <svg class="w-4 h-4 text-brand-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         <span id="liveClockDate">--</span>
         <span class="font-bold text-slate-900 text-sm font-mono" id="liveClockTime">--:--:--</span>
@@ -206,17 +207,14 @@
     <!-- VIEW 2: STAFF (PERSONEL) ATTENDANCE DASHBOARD -->
     <div id="viewStaff" class="hidden flex-1 flex flex-col gap-6">
       
-      <!-- Staff Welcome & Live Status Banner -->
-      <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200/80 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        <div class="flex items-center gap-4">
+      <!-- Staff Welcome & Live Status Banner (No Time Display) -->
+      <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-4 w-full sm:w-auto">
           <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center text-white text-2xl font-bold shadow-md shadow-brand-500/20">
             <span id="staffAvatarInitials">AY</span>
           </div>
           <div>
-            <div class="flex items-center gap-2">
-              <h2 class="text-xl sm:text-2xl font-bold text-slate-900" id="staffDisplayName">Ahmet Yılmaz</h2>
-              <span id="staffStatusBadge" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">Henüz Giriş Yapılmadı</span>
-            </div>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-900" id="staffDisplayName">Ahmet Yılmaz</h2>
             <p class="text-sm text-slate-500 flex items-center gap-2 mt-1">
               <span id="staffDepartmentDisplay">Yazılım & Bilişim</span> •
               <span class="font-mono text-xs text-slate-400" id="staffTcMasked">T.C: *******1110</span>
@@ -224,21 +222,11 @@
           </div>
         </div>
 
-        <!-- Today Summary Counter -->
-        <div class="w-full md:w-auto flex items-center justify-between md:justify-end gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-          <div class="text-left">
-            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Bugünkü Giriş</div>
-            <div class="text-lg font-bold text-slate-900 font-mono" id="todayCheckInDisplay">--:--</div>
-          </div>
-          <div class="h-8 w-px bg-slate-200"></div>
-          <div class="text-left">
-            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Bugünkü Çıkış</div>
-            <div class="text-lg font-bold text-slate-900 font-mono" id="todayCheckOutDisplay">--:--</div>
-          </div>
-          <div class="h-8 w-px bg-slate-200"></div>
-          <div class="text-left">
-            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Toplam Mesai</div>
-            <div class="text-lg font-bold text-brand-600 font-mono" id="todayDurationDisplay">0s 00d</div>
+        <!-- Current Status Pill (Zero Time Shown to Staff) -->
+        <div class="w-full sm:w-auto flex justify-start sm:justify-end">
+          <div id="staffStatusBadge" class="px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold bg-slate-100 text-slate-600 flex items-center gap-2 shadow-sm border border-slate-200/60">
+            <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+            <span>Henüz Giriş Yapılmadı</span>
           </div>
         </div>
       </div>
@@ -253,7 +241,7 @@
             <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
           </div>
           <span class="text-2xl sm:text-3xl font-extrabold tracking-wide uppercase">İŞE GELDİM</span>
-          <span class="text-emerald-100 text-sm mt-1 font-medium" id="clockInBtnSubtext">Giriş saatini kaydetmek için dokunun</span>
+          <span class="text-emerald-100 text-sm mt-1 font-medium" id="clockInBtnSubtext">Giriş bildirmek için dokunun</span>
           <div id="clockInDoneBadge" class="hidden mt-3 px-3 py-1 bg-white/25 rounded-full text-xs font-semibold tracking-wider flex items-center gap-1.5">
             <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
             <span id="clockInDoneTime">Giriş Yapıldı</span>
@@ -267,7 +255,7 @@
             <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
           </div>
           <span class="text-2xl sm:text-3xl font-extrabold tracking-wide uppercase">İŞTEN ÇIKTIM</span>
-          <span class="text-rose-100 text-sm mt-1 font-medium" id="clockOutBtnSubtext">Çıkış saatini kaydetmek için dokunun</span>
+          <span class="text-rose-100 text-sm mt-1 font-medium" id="clockOutBtnSubtext">Çıkış bildirmek için dokunun</span>
           <div id="clockOutDoneBadge" class="hidden mt-3 px-3 py-1 bg-white/25 rounded-full text-xs font-semibold tracking-wider flex items-center gap-1.5">
             <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
             <span id="clockOutDoneTime">Çıkış Yapıldı</span>
@@ -276,38 +264,20 @@
 
       </div>
 
-      <!-- Personal Attendance History Table -->
-      <div class="bg-white rounded-3xl shadow-sm border border-slate-200/80 overflow-hidden flex flex-col">
-        <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div>
-            <h3 class="text-lg font-bold text-slate-900">Geçmiş Puantaj Kayıtlarım</h3>
-            <p class="text-xs text-slate-500 mt-0.5">Yalnızca size ait çalışma ve mesai kayıtları listelenmektedir.</p>
-          </div>
-          <div class="flex items-center gap-2">
-            <select id="staffHistoryFilter" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-700 outline-none focus:ring-2 focus:ring-brand-500">
-              <option value="this-month">Bu Ay</option>
-              <option value="last-month">Geçen Ay</option>
-              <option value="all">Tüm Geçmiş</option>
-            </select>
-          </div>
+      <!-- Staff Status Guidance Card (No Mesai Table - Clean Attendance Action) -->
+      <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-200/80 flex flex-col sm:flex-row items-center gap-5">
+        <div id="staffStatusIconBox" class="w-14 h-14 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center flex-shrink-0 shadow-inner">
+          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         </div>
-
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-sm text-slate-600">
-            <thead class="bg-slate-50/75 text-xs uppercase font-semibold text-slate-500 border-b border-slate-100">
-              <tr>
-                <th class="px-6 py-3.5">Tarih</th>
-                <th class="px-6 py-3.5">Giriş Saati</th>
-                <th class="px-6 py-3.5">Çıkış Saati</th>
-                <th class="px-6 py-3.5">Toplam Süre</th>
-                <th class="px-6 py-3.5">Durum</th>
-                <th class="px-6 py-3.5">Açıklama / Düzeltme</th>
-              </tr>
-            </thead>
-            <tbody id="staffHistoryTableBody" class="divide-y divide-slate-100 font-medium">
-              <!-- Rendered via JS -->
-            </tbody>
-          </table>
+        <div class="flex-1 text-center sm:text-left">
+          <h3 id="staffStatusInfoTitle" class="text-base font-bold text-slate-900">Puantaj Bildirimi</h3>
+          <p id="staffStatusInfoText" class="text-sm text-slate-600 mt-1 leading-relaxed">
+            Mesainize başlarken <strong class="text-emerald-600 font-bold">İŞE GELDİM</strong>, mesainizi bitirdiğinizde ise <strong class="text-rose-600 font-bold">İŞTEN ÇIKTIM</strong> butonuna dokunmanız yeterlidir. Giriş ve çıkış işlemleriniz anında şirket yönetim sistemine güvenle iletilmektedir.
+          </p>
+          <p class="text-xs text-slate-400 mt-2 flex items-center justify-center sm:justify-start gap-1.5">
+            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+            Tüm mesai ve puantaj dökümleri yalnızca yetkili yöneticiniz tarafından denetlenir ve raporlanır.
+          </p>
         </div>
       </div>
 
@@ -1058,6 +1028,16 @@
         document.getElementById('viewStaff').classList.add('hidden');
         document.getElementById('viewAdmin').classList.add('hidden');
 
+        // Hide live clock from staff so personnel sees NO time anywhere
+        const headerClock = document.getElementById('headerLiveClock');
+        if (headerClock) {
+          if (viewName === 'staff') {
+            headerClock.classList.add('!hidden');
+          } else {
+            headerClock.classList.remove('!hidden');
+          }
+        }
+
         if (viewName === 'login') {
           document.getElementById('viewLogin').classList.remove('hidden');
           renderSessionHeader(null);
@@ -1279,9 +1259,9 @@
         const outBadge = document.getElementById('clockOutDoneBadge');
         const statusBadge = document.getElementById('staffStatusBadge');
 
-        const inDisp = document.getElementById('todayCheckInDisplay');
-        const outDisp = document.getElementById('todayCheckOutDisplay');
-        const durDisp = document.getElementById('todayDurationDisplay');
+        const infoTitle = document.getElementById('staffStatusInfoTitle');
+        const infoText = document.getElementById('staffStatusInfoText');
+        const iconBox = document.getElementById('staffStatusIconBox');
 
         // Reset badges
         inBadge.classList.add('hidden');
@@ -1291,46 +1271,47 @@
           // Has NOT checked in today
           btnIn.disabled = false;
           btnOut.disabled = true;
-          inSubtext.textContent = 'Giriş saatini kaydetmek için dokunun';
+          inSubtext.textContent = 'Giriş bildirmek için dokunun';
           outSubtext.textContent = 'Önce işe giriş yapmalısınız';
-          statusBadge.textContent = 'Henüz Giriş Yapılmadı';
-          statusBadge.className = 'text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600';
-          inDisp.textContent = '--:--';
-          outDisp.textContent = '--:--';
-          durDisp.textContent = '0s 00d';
+          statusBadge.innerHTML = '<span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span><span>Henüz Giriş Yapılmadı</span>';
+          statusBadge.className = 'px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold bg-slate-100 text-slate-600 flex items-center gap-2 shadow-sm border border-slate-200/60';
+
+          if (infoTitle) infoTitle.textContent = 'Güne Başlama';
+          if (infoText) infoText.innerHTML = 'Mesainize başlarken yukarıdaki <strong class="text-emerald-600 font-bold">İŞE GELDİM</strong> butonuna dokununuz.';
+          if (iconBox) iconBox.className = 'w-14 h-14 rounded-2xl bg-slate-100 text-slate-600 flex items-center justify-center flex-shrink-0 shadow-inner';
         } else if (todayRecord.checkIn && !todayRecord.checkOut) {
-          // Checked in, NOT checked out (Currently working)
+          // Checked in, NOT checked out (Currently working - ZERO time shown to staff)
           btnIn.disabled = true;
           btnOut.disabled = false;
-          inSubtext.textContent = `Bugün saat ${todayRecord.checkIn}'de giriş yapıldı`;
+          inSubtext.textContent = 'Giriş kaydınız alındı';
           inBadge.classList.remove('hidden');
-          document.getElementById('clockInDoneTime').textContent = `Giriş: ${todayRecord.checkIn}`;
-          outSubtext.textContent = 'Çıkış saatini kaydetmek için dokunun';
-          statusBadge.textContent = `Mesaide (${todayRecord.checkIn}'den beri)`;
-          statusBadge.className = 'text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 animate-pulse';
-          inDisp.textContent = todayRecord.checkIn;
-          outDisp.textContent = '--:--';
+          document.getElementById('clockInDoneTime').textContent = 'Giriş Yapıldı';
+          outSubtext.textContent = 'Çıkış bildirmek için dokunun';
+          statusBadge.innerHTML = '<span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span><span>Giriş Yapıldı / Çalışıyor</span>';
+          statusBadge.className = 'px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold bg-emerald-100 text-emerald-800 flex items-center gap-2 shadow-sm border border-emerald-200/60';
 
-          const currentMinutes = calculateMinutesBetween(todayRecord.checkIn, now.timeStr);
-          durDisp.textContent = formatMinutesToHours(currentMinutes);
+          if (infoTitle) infoTitle.textContent = 'Mesainiz Devam Ediyor';
+          if (infoText) infoText.innerHTML = 'İşe giriş işleminiz sisteme kaydedildi. Mesai bitiminde lütfen <strong class="text-rose-600 font-bold">İŞTEN ÇIKTIM</strong> butonuna dokunmayı unutmayınız.';
+          if (iconBox) iconBox.className = 'w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0 shadow-inner';
         } else if (todayRecord.checkIn && todayRecord.checkOut) {
-          // Completed day
+          // Completed day (ZERO time shown to staff)
           btnIn.disabled = true;
           btnOut.disabled = true;
-          inSubtext.textContent = `Bugün saat ${todayRecord.checkIn}'de giriş yapıldı`;
+          inSubtext.textContent = 'Giriş kaydınız alındı';
           inBadge.classList.remove('hidden');
-          document.getElementById('clockInDoneTime').textContent = `Giriş: ${todayRecord.checkIn}`;
-          outSubtext.textContent = `Bugün saat ${todayRecord.checkOut}'de çıkış yapıldı`;
+          document.getElementById('clockInDoneTime').textContent = 'Giriş Yapıldı';
+          outSubtext.textContent = 'Çıkış kaydınız alındı';
           outBadge.classList.remove('hidden');
-          document.getElementById('clockOutDoneTime').textContent = `Çıkış: ${todayRecord.checkOut}`;
-          statusBadge.textContent = 'Günü Tamamladı';
-          statusBadge.className = 'text-xs font-semibold px-2.5 py-1 rounded-full bg-indigo-100 text-indigo-800';
-          inDisp.textContent = todayRecord.checkIn;
-          outDisp.textContent = todayRecord.checkOut;
-          durDisp.textContent = formatMinutesToHours(todayRecord.durationMinutes);
+          document.getElementById('clockOutDoneTime').textContent = 'Çıkış Yapıldı';
+          statusBadge.innerHTML = '<span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span><span>Bugünkü Çalışma Tamamlandı</span>';
+          statusBadge.className = 'px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold bg-indigo-100 text-indigo-800 flex items-center gap-2 shadow-sm border border-indigo-200/60';
+
+          if (infoTitle) infoTitle.textContent = 'Bugünkü Çalışma Tamamlandı';
+          if (infoText) infoText.innerHTML = 'Giriş ve çıkış işlemleriniz başarıyla kaydedilmiştir. İyi istirahatler dileriz!';
+          if (iconBox) iconBox.className = 'w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center flex-shrink-0 shadow-inner';
         }
 
-        renderStaffHistoryTable(staff.id);
+        // Note: Personnel does NOT view any time data. All timestamps are strictly routed to Admin Panel!
       }
 
       async function handleStaffClockIn() {
@@ -1342,7 +1323,7 @@
         // STRICT DUPLICATE CHECK: Verify if already checked in today
         const existing = state.attendance.find(a => a.staffId === staff.id && a.date === today);
         if (existing && existing.checkIn) {
-          showToast(`Bugün saat ${existing.checkIn}'de zaten işe giriş kaydınız alınmıştır. Mükerrer kayıt engellendi.`, 'warning');
+          showToast('Bugün için işe giriş kaydınız zaten alınmıştır.', 'warning');
           return;
         }
 
@@ -1362,7 +1343,7 @@
         state.attendance.unshift(newRecord);
         await saveState();
 
-        showToast(`✅ İşe girişiniz başarıyla kaydedildi! Saat: ${now.timeStr}`, 'success');
+        showToast('✅ İşe giriş kaydınız başarıyla alındı!', 'success');
         renderStaffDashboard();
       }
 
@@ -1380,7 +1361,7 @@
 
         // STRICT DUPLICATE CHECK: Verify if already checked out today
         if (record.checkOut) {
-          showToast(`Bugün saat ${record.checkOut}'de zaten çıkış kaydınız alınmıştır. Mükerrer kayıt engellendi.`, 'warning');
+          showToast('Bugün için işten çıkış kaydınız zaten alınmıştır.', 'warning');
           return;
         }
 
@@ -1391,69 +1372,10 @@
 
         await saveState();
 
-        showToast(`🏁 İşten çıkışınız kaydedildi! Toplam mesai: ${formatMinutesToHours(record.durationMinutes)}`, 'success');
+        showToast('🏁 İşten çıkış kaydınız başarıyla alındı. İyi istirahatler dileriz!', 'success');
         renderStaffDashboard();
       }
 
-      function renderStaffHistoryTable(staffId) {
-        const tbody = document.getElementById('staffHistoryTableBody');
-        const filterVal = document.getElementById('staffHistoryFilter').value;
-        tbody.innerHTML = '';
-
-        // Strict isolation: only records belonging to this staffId
-        let records = state.attendance.filter(a => a.staffId === staffId);
-
-        // Date sorting descending
-        records.sort((a, b) => b.date.localeCompare(a.date));
-
-        const now = getNowIstanbul();
-        const currentYearMonth = now.dateStr.slice(0, 7); // YYYY-MM
-
-        if (filterVal === 'this-month') {
-          records = records.filter(r => r.date.startsWith(currentYearMonth));
-        } else if (filterVal === 'last-month') {
-          const d = new Date(now.raw.getFullYear(), now.raw.getMonth() - 1, 1);
-          const lastYm = `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}`;
-          records = records.filter(r => r.date.startsWith(lastYm));
-        }
-
-        if (records.length === 0) {
-          tbody.innerHTML = `
-            <tr>
-              <td colspan="6" class="px-6 py-8 text-center text-slate-400 text-xs">
-                Seçilen döneme ait herhangi bir puantaj kaydınız bulunmamaktadır.
-              </td>
-            </tr>
-          `;
-          return;
-        }
-
-        records.forEach(r => {
-          const tr = document.createElement('tr');
-          tr.className = 'hover:bg-slate-50 transition-colors';
-
-          let statusBadge = '';
-          if (r.status === 'Tamamlandı') {
-            statusBadge = '<span class="px-2 py-0.5 rounded-full text-[11px] bg-emerald-100 text-emerald-800">Tamamlandı</span>';
-          } else if (r.status === 'Mesaide') {
-            statusBadge = '<span class="px-2 py-0.5 rounded-full text-[11px] bg-indigo-100 text-indigo-800 animate-pulse">Mesaide</span>';
-          } else if (r.status === 'Düzeltildi') {
-            statusBadge = '<span class="px-2 py-0.5 rounded-full text-[11px] bg-purple-100 text-purple-800">Yönetici Düzeltmesi</span>';
-          } else {
-            statusBadge = `<span class="px-2 py-0.5 rounded-full text-[11px] bg-amber-100 text-amber-800">${escapeHtml(r.status)}</span>`;
-          }
-
-          tr.innerHTML = `
-            <td class="px-6 py-4 font-mono font-medium text-slate-900">${escapeHtml(r.date)}</td>
-            <td class="px-6 py-4 font-mono text-emerald-600 font-bold">${r.checkIn || '--:--'}</td>
-            <td class="px-6 py-4 font-mono text-rose-600 font-bold">${r.checkOut || '--:--'}</td>
-            <td class="px-6 py-4 font-mono text-slate-700">${formatMinutesToHours(r.durationMinutes)}</td>
-            <td class="px-6 py-4">${statusBadge}</td>
-            <td class="px-6 py-4 text-xs text-slate-500 max-w-xs truncate">${escapeHtml(r.notes || '-')}</td>
-          `;
-          tbody.appendChild(tr);
-        });
-      }
 
       // -------------------------------------------------------------
       // ADMIN DASHBOARD LOGIC (STAFF MANAGEMENT, EDIT, CSV, AUDIT)
@@ -1840,733 +1762,4 @@
 
         const formHtml = `
           <div class="space-y-4">
-            <div class="p-3 bg-brand-50 rounded-xl text-xs text-brand-800">
-              Kullanılan Kota: <strong>${state.staffList.length} / ${MAX_STAFF_LIMIT} Personel</strong>
-            </div>
-
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label for="newStaffName" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Adı</label>
-                <input type="text" id="newStaffName" placeholder="Örn: Burak" required class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs outline-none focus:ring-2 focus:ring-brand-500">
-              </div>
-              <div>
-                <label for="newStaffSurname" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Soyadı</label>
-                <input type="text" id="newStaffSurname" placeholder="Örn: Aydın" required class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs outline-none focus:ring-2 focus:ring-brand-500">
-              </div>
-            </div>
-
-            <div>
-              <label for="newStaffTc" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">T.C. Kimlik Numarası (11 Hane)</label>
-              <input type="text" id="newStaffTc" maxlength="11" pattern="\\d{11}" placeholder="11 haneli T.C." required inputmode="numeric" class="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono text-sm outline-none focus:ring-2 focus:ring-brand-500">
-            </div>
-
-            <div>
-              <label for="newStaffDepartment" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Departman</label>
-              <select id="newStaffDepartment" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs outline-none focus:ring-2 focus:ring-brand-500">
-                <option value="Yazılım & Bilişim">Yazılım & Bilişim</option>
-                <option value="Muhasebe & Finans">Muhasebe & Finans</option>
-                <option value="İnsan Kaynakları">İnsan Kaynakları</option>
-                <option value="Pazarlama & Satış">Pazarlama & Satış</option>
-                <option value="Lojistik & Depo">Lojistik & Depo</option>
-                <option value="Üretim & İmalat">Üretim & İmalat</option>
-                <option value="Genel Yönetim">Genel Yönetim</option>
-              </select>
-            </div>
-
-            <div>
-              <label for="newStaffPin" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">4 Haneli Giriş PIN Kodu</label>
-              <input type="password" id="newStaffPin" maxlength="4" pattern="\\d{4}" placeholder="••••" required inputmode="numeric" class="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono text-center text-lg outline-none focus:ring-2 focus:ring-brand-500">
-              <p class="text-[11px] text-slate-400 mt-1">PIN kodu güvenli biçimde SHA-256 olarak şifrelenir ve asla düz metin olarak saklanmaz.</p>
-            </div>
-          </div>
-        `;
-
-        openModal('Yeni Personel Tanımla (Maks 100)', formHtml, async () => {
-          const name = document.getElementById('newStaffName').value.trim();
-          const surname = document.getElementById('newStaffSurname').value.trim();
-          const tc = document.getElementById('newStaffTc').value.trim();
-          const department = document.getElementById('newStaffDepartment').value;
-          const pin = document.getElementById('newStaffPin').value.trim();
-
-          if (!name || !surname) {
-            showToast('Ad ve soyad zorunludur.', 'warning');
-            return false;
-          }
-          if (!/^\d{11}$/.test(tc)) {
-            showToast('T.C. Kimlik numarası 11 haneli rakam olmalıdır.', 'warning');
-            return false;
-          }
-          if (!/^\d{4}$/.test(pin)) {
-            showToast('PIN kodu 4 haneli rakam olmalıdır.', 'warning');
-            return false;
-          }
-
-          // Check duplicate TC
-          if (state.staffList.some(s => s.tc === tc)) {
-            showToast('Bu T.C. Kimlik numarasıyla zaten bir personel kayıtlı!', 'error');
-            return false;
-          }
-
-          const pinHash = await sha256(pin);
-          const newStaff = {
-            id: 'stf_' + Date.now(),
-            tc: tc,
-            pinHash: pinHash,
-            name: name,
-            surname: surname,
-            department: department,
-            active: true,
-            createdAt: getNowIstanbul().dateStr
-          };
-
-          state.staffList.push(newStaff);
-
-          state.auditLogs.unshift({
-            id: 'aud_' + Date.now(),
-            timestamp: getNowIstanbul().fullStr,
-            adminName: state.adminUser.displayName,
-            staffName: `${name} ${surname}`,
-            recordDate: getNowIstanbul().dateStr,
-            field: 'Personel Hesabı',
-            oldValue: 'Yok',
-            newValue: `T.C: ${tc}, Dep: ${department}`,
-            reason: 'Yönetici tarafından yeni personel hesabı oluşturuldu.'
-          });
-
-          await saveState();
-          showToast(`Personel ${name} ${surname} başarıyla kaydedildi.`, 'success');
-          renderAdminMetrics();
-          renderAdminStaffTable();
-          populateAdminStaffFilter();
-          return true;
-        }, 'Personeli Kaydet');
-      }
-
-      function openEditStaffModal(staffId) {
-        const staff = state.staffList.find(s => s.id === staffId);
-        if (!staff) return;
-
-        const formHtml = `
-          <div class="space-y-4">
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label for="editStaffName" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Adı</label>
-                <input type="text" id="editStaffName" value="${escapeHtml(staff.name)}" required class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs outline-none focus:ring-2 focus:ring-brand-500">
-              </div>
-              <div>
-                <label for="editStaffSurname" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Soyadı</label>
-                <input type="text" id="editStaffSurname" value="${escapeHtml(staff.surname)}" required class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs outline-none focus:ring-2 focus:ring-brand-500">
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">T.C. Kimlik Numarası</label>
-              <input type="text" disabled value="${escapeHtml(staff.tc)}" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-100 font-mono text-xs text-slate-500">
-              <p class="text-[10px] text-slate-400 mt-0.5">T.C. Kimlik numarası güvenlik nedeniyle sonradan değiştirilemez.</p>
-            </div>
-
-            <div>
-              <label for="editStaffDepartment" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Departman</label>
-              <input type="text" id="editStaffDepartment" value="${escapeHtml(staff.department)}" required class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs outline-none focus:ring-2 focus:ring-brand-500">
-            </div>
-
-            <div>
-              <label for="editStaffActive" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Durum</label>
-              <select id="editStaffActive" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs outline-none focus:ring-2 focus:ring-brand-500">
-                <option value="true" ${staff.active ? 'selected' : ''}>Aktif</option>
-                <option value="false" ${!staff.active ? 'selected' : ''}>Pasif</option>
-              </select>
-            </div>
-          </div>
-        `;
-
-        openModal('Personel Bilgilerini Düzenle', formHtml, async () => {
-          const name = document.getElementById('editStaffName').value.trim();
-          const surname = document.getElementById('editStaffSurname').value.trim();
-          const department = document.getElementById('editStaffDepartment').value.trim();
-          const active = document.getElementById('editStaffActive').value === 'true';
-
-          if (!name || !surname) {
-            showToast('Ad ve soyad zorunludur.', 'warning');
-            return false;
-          }
-
-          staff.name = name;
-          staff.surname = surname;
-          staff.department = department;
-          staff.active = active;
-
-          await saveState();
-          showToast('Personel bilgileri güncellendi.', 'success');
-          renderAdminStaffTable();
-          populateAdminStaffFilter();
-          return true;
-        }, 'Güncelle');
-      }
-
-      function openResetPinModal(staffId) {
-        const staff = state.staffList.find(s => s.id === staffId);
-        if (!staff) return;
-
-        const formHtml = `
-          <div class="space-y-4">
-            <p class="text-xs text-slate-600">
-              <strong>${escapeHtml(staff.name + ' ' + staff.surname)}</strong> için yeni bir 4 haneli PIN kodu belirleyin.
-            </p>
-            <div>
-              <label for="resetPinInput" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Yeni 4 Haneli PIN</label>
-              <input type="password" id="resetPinInput" maxlength="4" pattern="\\d{4}" placeholder="••••" required inputmode="numeric" class="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono text-center text-xl outline-none focus:ring-2 focus:ring-brand-500">
-            </div>
-          </div>
-        `;
-
-        openModal('PIN Sıfırla / Yeni PIN Ata', formHtml, async () => {
-          const newPin = document.getElementById('resetPinInput').value.trim();
-          if (!/^\d{4}$/.test(newPin)) {
-            showToast('PIN kodu tam 4 haneli rakam olmalıdır.', 'warning');
-            return false;
-          }
-
-          staff.pinHash = await sha256(newPin);
-
-          state.auditLogs.unshift({
-            id: 'aud_' + Date.now(),
-            timestamp: getNowIstanbul().fullStr,
-            adminName: state.adminUser.displayName,
-            staffName: `${staff.name} ${staff.surname}`,
-            recordDate: getNowIstanbul().dateStr,
-            field: 'PIN Kodu',
-            oldValue: 'Eski PIN (SHA-256)',
-            newValue: 'Yeni PIN Belirlendi (SHA-256)',
-            reason: 'Yönetici tarafından PIN sıfırlama işlemi yapıldı.'
-          });
-
-          await saveState();
-          showToast(`${staff.name} ${staff.surname} için yeni PIN başarıyla kaydedildi.`, 'success');
-          renderAdminAuditTable();
-          return true;
-        }, 'PIN Kodunu Güncelle');
-      }
-
-      async function toggleStaffActive(staffId) {
-        const staff = state.staffList.find(s => s.id === staffId);
-        if (!staff) return;
-
-        staff.active = !staff.active;
-        state.auditLogs.unshift({
-          id: 'aud_' + Date.now(),
-          timestamp: getNowIstanbul().fullStr,
-          adminName: state.adminUser.displayName,
-          staffName: `${staff.name} ${staff.surname}`,
-          recordDate: getNowIstanbul().dateStr,
-          field: 'Hesap Durumu',
-          oldValue: staff.active ? 'Pasif' : 'Aktif',
-          newValue: staff.active ? 'Aktif' : 'Pasif',
-          reason: staff.active ? 'Hesap yeniden aktifleştirildi.' : 'Personel hesabı geçici olarak pasife alındı.'
-        });
-
-        await saveState();
-        showToast(`${staff.name} ${staff.surname} durumu "${staff.active ? 'Aktif' : 'Pasif'}" olarak güncellendi.`, 'info');
-        renderAdminStaffTable();
-        renderAdminMetrics();
-        renderAdminAuditTable();
-      }
-
-      // -------------------------------------------------------------
-      // CSV EXPORT (EXCEL COMPATIBLE WITH UTF-8 BOM)
-      // -------------------------------------------------------------
-      function exportPuantajCsv() {
-        if (state.attendance.length === 0) {
-          showToast('Dışa aktarılacak puantaj verisi bulunmuyor.', 'warning');
-          return;
-        }
-
-        // Excel in Turkish locale uses semicolon ';' delimiter
-        const headers = ['Tarih', 'Personel Adi Soyadi', 'T.C. Kimlik No', 'Departman', 'Giris Saati', 'Cikis Saati', 'Toplam Calisma Suresi (Dk)', 'Calisma Suresi', 'Durum', 'Aciklama', 'Duzenleyen Yonetici', 'Duzenleme Zamani'];
-        
-        let csvContent = '\uFEFF'; // UTF-8 BOM for Excel
-        csvContent += headers.join(';') + '\r\n';
-
-        state.attendance.forEach(rec => {
-          const staff = state.staffList.find(s => s.id === rec.staffId) || { name: 'Bilinmeyen', surname: '', tc: '', department: '' };
-          const row = [
-            `"${rec.date}"`,
-            `"${staff.name} ${staff.surname}"`,
-            `"${staff.tc}"`,
-            `"${staff.department}"`,
-            `"${rec.checkIn || ''}"`,
-            `"${rec.checkOut || ''}"`,
-            rec.durationMinutes || 0,
-            `"${formatMinutesToHours(rec.durationMinutes)}"`,
-            `"${rec.status || ''}"`,
-            `"${(rec.notes || '').replace(/"/g, '""')}"`,
-            `"${rec.updatedBy || ''}"`,
-            `"${rec.updatedAt || ''}"`
-          ];
-          csvContent += row.join(';') + '\r\n';
-        });
-
-        downloadBlobFile(csvContent, `Personel_Puantaj_Listesi_${getNowIstanbul().dateStr}.csv`, 'text/csv;charset=utf-8;');
-        showToast('Puantaj tablosu Excel uyumlu CSV olarak indirildi.', 'success');
-      }
-
-      function exportMonthlyReportsCsv() {
-        const month = document.getElementById('reportMonthSelect').value || getNowIstanbul().dateStr.slice(0, 7);
-        const headers = ['Personel Adi Soyadi', 'Departman', 'Donem', 'Calisilan Gun Sayisi', 'Toplam Mesai Suresi', 'Toplam Dakika', 'Gunluk Ortalama Sure', 'Gec Giris Sayisi', 'Eksik Cikis Sayisi'];
-
-        let csvContent = '\uFEFF';
-        csvContent += headers.join(';') + '\r\n';
-
-        state.staffList.forEach(staff => {
-          const staffMonthRecords = state.attendance.filter(a => a.staffId === staff.id && a.date.startsWith(month));
-          const daysWorked = staffMonthRecords.filter(a => a.checkIn).length;
-          const totalMins = staffMonthRecords.reduce((acc, r) => acc + (r.durationMinutes || 0), 0);
-          const avgMins = daysWorked > 0 ? Math.round(totalMins / daysWorked) : 0;
-          const lateCount = staffMonthRecords.filter(a => a.status === 'Geç Giriş').length;
-          const missingCount = staffMonthRecords.filter(a => a.status === 'Eksik Kayıt' || (a.checkIn && !a.checkOut)).length;
-
-          const row = [
-            `"${staff.name} ${staff.surname}"`,
-            `"${staff.department}"`,
-            `"${month}"`,
-            daysWorked,
-            `"${formatMinutesToHours(totalMins)}"`,
-            totalMins,
-            `"${formatMinutesToHours(avgMins)}"`,
-            lateCount,
-            missingCount
-          ];
-          csvContent += row.join(';') + '\r\n';
-        });
-
-        downloadBlobFile(csvContent, `Aylik_Puantaj_Ozeti_${month}.csv`, 'text/csv;charset=utf-8;');
-        showToast('Aylık personel özet raporu Excel uyumlu CSV olarak indirildi.', 'success');
-      }
-
-      function downloadBlobFile(content, fileName, mimeType) {
-        const blob = new Blob([content], { type: mimeType });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      }
-
-      // -------------------------------------------------------------
-      // MONTHLY REPORTS RENDER
-      // -------------------------------------------------------------
-      function renderAdminReports() {
-        const select = document.getElementById('reportMonthSelect');
-        const tbody = document.getElementById('adminReportsTableBody');
-        tbody.innerHTML = '';
-
-        // Collect available months from attendance
-        const monthsSet = new Set();
-        monthsSet.add(getNowIstanbul().dateStr.slice(0, 7));
-        state.attendance.forEach(a => monthsSet.add(a.date.slice(0, 7)));
-
-        const months = Array.from(monthsSet).sort().reverse();
-
-        if (select.children.length === 0) {
-          months.forEach(m => {
-            const opt = document.createElement('option');
-            opt.value = m;
-            const [y, mo] = m.split('-');
-            const dateObj = new Date(parseInt(y), parseInt(mo) - 1, 1);
-            opt.textContent = dateObj.toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' });
-            select.appendChild(opt);
-          });
-        }
-
-        const selectedMonth = select.value || months[0];
-
-        state.staffList.forEach(staff => {
-          const staffMonthRecords = state.attendance.filter(a => a.staffId === staff.id && a.date.startsWith(selectedMonth));
-          const daysWorked = staffMonthRecords.filter(a => a.checkIn).length;
-          const totalMins = staffMonthRecords.reduce((acc, r) => acc + (r.durationMinutes || 0), 0);
-          const avgMins = daysWorked > 0 ? Math.round(totalMins / daysWorked) : 0;
-          const lateCount = staffMonthRecords.filter(a => a.status === 'Geç Giriş').length;
-          const missingCount = staffMonthRecords.filter(a => a.status === 'Eksik Kayıt' || (a.checkIn && !a.checkOut)).length;
-
-          const tr = document.createElement('tr');
-          tr.className = 'hover:bg-slate-50/80 transition-colors';
-          tr.innerHTML = `
-            <td class="px-6 py-4 font-bold text-slate-900">${escapeHtml(staff.name + ' ' + staff.surname)}</td>
-            <td class="px-6 py-4 text-xs text-slate-500">${escapeHtml(staff.department)}</td>
-            <td class="px-6 py-4 font-mono font-semibold text-slate-800">${daysWorked} gün</td>
-            <td class="px-6 py-4 font-mono font-bold text-brand-600">${formatMinutesToHours(totalMins)}</td>
-            <td class="px-6 py-4 font-mono text-slate-600">${formatMinutesToHours(avgMins)}</td>
-            <td class="px-6 py-4 font-mono text-amber-600">${lateCount} kez</td>
-            <td class="px-6 py-4 font-mono text-rose-600">${missingCount} eksik</td>
-          `;
-          tbody.appendChild(tr);
-        });
-      }
-
-      // -------------------------------------------------------------
-      // AUDIT LOGS TABLE RENDER
-      // -------------------------------------------------------------
-      function renderAdminAuditTable() {
-        const tbody = document.getElementById('adminAuditTableBody');
-        const badge = document.getElementById('auditLogCountBadge');
-        tbody.innerHTML = '';
-
-        badge.textContent = `${state.auditLogs.length} İşlem Kayıtlı`;
-
-        if (state.auditLogs.length === 0) {
-          tbody.innerHTML = `
-            <tr>
-              <td colspan="7" class="px-6 py-8 text-center text-slate-400 text-xs">
-                Henüz herhangi bir yönetici düzeltmesi yapılmamış.
-              </td>
-            </tr>
-          `;
-          return;
-        }
-
-        state.auditLogs.forEach(log => {
-          const tr = document.createElement('tr');
-          tr.className = 'hover:bg-slate-50 transition-colors';
-          tr.innerHTML = `
-            <td class="px-5 py-3 font-mono text-slate-500 whitespace-nowrap">${escapeHtml(log.timestamp)}</td>
-            <td class="px-5 py-3 font-semibold text-slate-800">${escapeHtml(log.adminName)}</td>
-            <td class="px-5 py-3 text-slate-700">${escapeHtml(log.staffName)}</td>
-            <td class="px-5 py-3 font-mono text-slate-600">${escapeHtml(log.recordDate)}</td>
-            <td class="px-5 py-3 font-mono text-rose-600 bg-rose-50/50 rounded">${escapeHtml(log.oldValue)}</td>
-            <td class="px-5 py-3 font-mono text-emerald-600 bg-emerald-50/50 rounded">${escapeHtml(log.newValue)}</td>
-            <td class="px-5 py-3 text-slate-600 italic">${escapeHtml(log.reason)}</td>
-          `;
-          tbody.appendChild(tr);
-        });
-      }
-
-      // -------------------------------------------------------------
-      // NOTIFICATIONS & WEB PUSH ARCHITECTURE
-      // -------------------------------------------------------------
-      function checkPushCapability() {
-        const badge = document.getElementById('pushSupportBadge');
-        const permText = document.getElementById('currentPermissionText');
-
-        if (!('Notification' in window)) {
-          badge.textContent = 'Desteklenmiyor';
-          badge.className = 'text-xs font-semibold px-2.5 py-1 rounded-full bg-rose-100 text-rose-800';
-          permText.textContent = 'Bu tarayıcıda Web Notifications API yok.';
-          return;
-        }
-
-        const perm = Notification.permission;
-        permText.textContent = perm === 'granted' ? 'İzin Verildi ✅' : (perm === 'denied' ? 'Reddedildi ❌' : 'İzin İstenmedi ⏳');
-
-        if (perm === 'granted') {
-          badge.textContent = 'Aktif & İzinli';
-          badge.className = 'text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800';
-        } else if (perm === 'denied') {
-          badge.textContent = 'İzin Reddedildi';
-          badge.className = 'text-xs font-semibold px-2.5 py-1 rounded-full bg-rose-100 text-rose-800';
-        } else {
-          badge.textContent = 'İzin Bekleniyor';
-          badge.className = 'text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-100 text-amber-800';
-        }
-      }
-
-      async function requestNotificationPermission() {
-        if (!('Notification' in window)) {
-          showToast('Tarayıcınız bildirim desteği sunmamaktadır.', 'error');
-          return;
-        }
-
-        try {
-          const perm = await Notification.requestPermission();
-          checkPushCapability();
-          if (perm === 'granted') {
-            showToast('Bildirim izni başarıyla verildi! Hatırlatmaları alacaksınız.', 'success');
-          } else {
-            showToast('Bildirim izni verilmedi.', 'warning');
-          }
-        } catch (e) {
-          showToast('Bildirim izni istenirken bir hata oluştu: ' + e.message, 'error');
-        }
-      }
-
-      function dispatchScheduledNotification(title, body, type = 'manual') {
-        const activeStaffCount = state.staffList.filter(s => s.active).length;
-
-        // Try local browser Notification if granted
-        if ('Notification' in window && Notification.permission === 'granted') {
-          try {
-            new Notification(title, {
-              body: body,
-              icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%234f46e5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>'
-            });
-          } catch (e) {
-            console.warn("Local notification creation error:", e);
-          }
-        }
-
-        // Always show in-app toast notification
-        showToast(`🔔 [ZAMANLANMIŞ BİLDİRİM] ${title}: ${body}`, 'info', 7000);
-
-        // Record in notification logs
-        state.notificationLogs.unshift({
-          id: 'notif_' + Date.now(),
-          timestamp: getNowIstanbul().fullStr,
-          title: title,
-          body: body,
-          targetCount: activeStaffCount,
-          status: 'Başarılı (Gönderildi)'
-        });
-
-        saveState();
-        renderNotificationLogs();
-      }
-
-      function renderNotificationLogs() {
-        const tbody = document.getElementById('notificationLogsTableBody');
-        const countText = document.getElementById('notificationLogCountText');
-        tbody.innerHTML = '';
-
-        countText.textContent = `${state.notificationLogs.length} bildirim kaydı`;
-
-        if (state.notificationLogs.length === 0) {
-          tbody.innerHTML = `
-            <tr>
-              <td colspan="5" class="px-6 py-6 text-center text-slate-400 text-xs">
-                Henüz gönderilmiş bildirim kaydı yok.
-              </td>
-            </tr>
-          `;
-          return;
-        }
-
-        state.notificationLogs.forEach(log => {
-          const tr = document.createElement('tr');
-          tr.className = 'hover:bg-slate-50 transition-colors';
-          tr.innerHTML = `
-            <td class="px-6 py-3 font-mono text-slate-500 whitespace-nowrap">${escapeHtml(log.timestamp)}</td>
-            <td class="px-6 py-3 font-semibold text-slate-800">${escapeHtml(log.title)}</td>
-            <td class="px-6 py-3 text-slate-600">${escapeHtml(log.body)}</td>
-            <td class="px-6 py-3 font-mono text-slate-700">${log.targetCount} Personel</td>
-            <td class="px-6 py-3"><span class="px-2 py-0.5 rounded-full text-[11px] bg-emerald-100 text-emerald-800">${escapeHtml(log.status)}</span></td>
-          `;
-          tbody.appendChild(tr);
-        });
-      }
-
-      function openServerCodeModal() {
-        const modalContent = `
-          <div class="space-y-4 text-xs text-slate-700">
-            <p>
-              Uygulama kapalıyken 08:00 ve 18:30 Europe/Istanbul bildirimlerinin gerçek sunucudan fırlatılması için hazırlanmış Node.js cron ve web-push servisi:
-            </p>
-            <div class="bg-slate-900 text-slate-200 p-4 rounded-xl font-mono text-[11px] overflow-x-auto">
-<pre>// cron-worker.js (Sunucu Tarafı)
-const cron = require('node-cron');
-const webpush = require('web-push');
-
-// 1. VAPID Anahtarları (Ücretsiz)
-webpush.setVapidDetails(
-  'mailto:yonetici@sirket.com',
-  process.env.VAPID_PUBLIC_KEY,
-  process.env.VAPID_PRIVATE_KEY
-);
-
-// 2. Sabah 08:00 İşe Giriş Bildirimi (Europe/Istanbul)
-cron.schedule('0 8 * * *', async () => {
-  console.log('[TR 08:00] İşe giriş hatırlatması aktif personele gönderiliyor...');
-  await sendPushToActiveStaff({
-    title: 'İşe Giriş Hatırlatması',
-    body: 'Lütfen işe giriş kaydınızı yapın.'
-  });
-}, { timezone: 'Europe/Istanbul' });
-
-// 3. Akşam 18:30 İşten Çıkış Bildirimi (Europe/Istanbul)
-cron.schedule('30 18 * * *', async () => {
-  console.log('[TR 18:30] İşten çıkış hatırlatması aktif personele gönderiliyor...');
-  await sendPushToActiveStaff({
-    title: 'İşten Çıkış Hatırlatması',
-    body: 'Lütfen işten çıkış kaydınızı yapın.'
-  });
-}, { timezone: 'Europe/Istanbul' });</pre>
-            </div>
-            <p class="text-[11px] text-slate-500">
-              * Bu sunucu altyapısı, veritabanı şeması ve Dockerfile <code>artifacts/file_generation/ttl=63d/output/personel_puantaj_pro.zip</code> dosyası olarak paketlenmiştir.
-            </p>
-          </div>
-        `;
-        openModal('Üretim Ortamı Web Push & Cron Altyapısı', modalContent, null, '', 'Kapat');
-      }
-
-      // -------------------------------------------------------------
-      // EVENT LISTENERS & ATTACHMENTS
-      // -------------------------------------------------------------
-      function attachEvents() {
-        // Staff / Admin Login Tabs
-        const tabStaffBtn = document.getElementById('tabStaffBtn');
-        const tabAdminBtn = document.getElementById('tabAdminBtn');
-        const staffLoginForm = document.getElementById('staffLoginForm');
-        const adminLoginForm = document.getElementById('adminLoginForm');
-
-        tabStaffBtn.onclick = () => {
-          tabStaffBtn.className = 'py-2.5 rounded-lg bg-white text-brand-700 shadow-sm transition-all flex items-center justify-center gap-2';
-          tabAdminBtn.className = 'py-2.5 rounded-lg hover:text-slate-900 transition-all flex items-center justify-center gap-2';
-          staffLoginForm.classList.remove('hidden');
-          adminLoginForm.classList.add('hidden');
-        };
-
-        tabAdminBtn.onclick = () => {
-          tabAdminBtn.className = 'py-2.5 rounded-lg bg-white text-indigo-700 shadow-sm transition-all flex items-center justify-center gap-2';
-          tabStaffBtn.className = 'py-2.5 rounded-lg hover:text-slate-900 transition-all flex items-center justify-center gap-2';
-          adminLoginForm.classList.remove('hidden');
-          staffLoginForm.classList.add('hidden');
-        };
-
-        // Staff Login Form Submit
-        staffLoginForm.onsubmit = async (e) => {
-          e.preventDefault();
-          const tc = document.getElementById('staffTcInput').value.trim();
-          const pin = document.getElementById('staffPinInput').value.trim();
-          await handleStaffLogin(tc, pin);
-        };
-
-        // Admin Login Form Submit
-        adminLoginForm.onsubmit = async (e) => {
-          e.preventDefault();
-          const user = document.getElementById('adminUsernameInput').value.trim();
-          const pass = document.getElementById('adminPasswordInput').value;
-          await handleAdminLogin(user, pass);
-        };
-
-        // Quick Demo Buttons
-        document.getElementById('quickStaffDemoBtn').onclick = async () => {
-          document.getElementById('staffTcInput').value = '11111111110';
-          document.getElementById('staffPinInput').value = '1234';
-          await handleStaffLogin('11111111110', '1234');
-        };
-
-        document.getElementById('quickAdminDemoBtn').onclick = async () => {
-          document.getElementById('adminUsernameInput').value = 'admin';
-          document.getElementById('adminPasswordInput').value = 'admin123';
-          await handleAdminLogin('admin', 'admin123');
-        };
-
-        // Staff Clock In / Out
-        document.getElementById('btnClockIn').onclick = handleStaffClockIn;
-        document.getElementById('btnClockOut').onclick = handleStaffClockOut;
-
-        // Staff History Filter Change
-        document.getElementById('staffHistoryFilter').onchange = () => {
-          if (state.currentUser && state.currentUser.role === 'staff') {
-            renderStaffHistoryTable(state.currentUser.data.id);
-          }
-        };
-
-        // Admin Sub-tabs Navigation
-        const adminTabPuantajBtn = document.getElementById('adminTabPuantajBtn');
-        const adminTabStaffBtn = document.getElementById('adminTabStaffBtn');
-        const adminTabReportsBtn = document.getElementById('adminTabReportsBtn');
-        const adminTabAuditBtn = document.getElementById('adminTabAuditBtn');
-        const adminTabNotificationsBtn = document.getElementById('adminTabNotificationsBtn');
-
-        const panels = {
-          puantaj: document.getElementById('adminPanelPuantaj'),
-          staff: document.getElementById('adminPanelStaff'),
-          reports: document.getElementById('adminPanelReports'),
-          audit: document.getElementById('adminPanelAudit'),
-          notifications: document.getElementById('adminPanelNotifications')
-        };
-
-        const buttons = {
-          puantaj: adminTabPuantajBtn,
-          staff: adminTabStaffBtn,
-          reports: adminTabReportsBtn,
-          audit: adminTabAuditBtn,
-          notifications: adminTabNotificationsBtn
-        };
-
-        function switchAdminTab(target) {
-          Object.keys(panels).forEach(key => {
-            panels[key].classList.add('hidden');
-            buttons[key].className = 'py-3 px-3 sm:px-4 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300 whitespace-nowrap flex items-center gap-2';
-          });
-          panels[target].classList.remove('hidden');
-          buttons[target].className = 'py-3 px-3 sm:px-4 text-sm font-semibold border-b-2 border-brand-600 text-brand-600 whitespace-nowrap flex items-center gap-2';
-        }
-
-        adminTabPuantajBtn.onclick = () => switchAdminTab('puantaj');
-        adminTabStaffBtn.onclick = () => switchAdminTab('staff');
-        adminTabReportsBtn.onclick = () => switchAdminTab('reports');
-        adminTabAuditBtn.onclick = () => switchAdminTab('audit');
-        adminTabNotificationsBtn.onclick = () => switchAdminTab('notifications');
-
-        // Admin Filter Listeners
-        document.getElementById('filterDateStart').onchange = renderAdminPuantajTable;
-        document.getElementById('filterDateEnd').onchange = renderAdminPuantajTable;
-        document.getElementById('filterStaffSelect').onchange = renderAdminPuantajTable;
-        document.getElementById('filterStatusSelect').onchange = renderAdminPuantajTable;
-
-        // Admin Action Buttons
-        document.getElementById('btnOpenManualEntryModal').onclick = openManualEntryModal;
-        document.getElementById('btnExportPuantajCsv').onclick = exportPuantajCsv;
-        document.getElementById('btnOpenAddStaffModal').onclick = openAddStaffModal;
-        document.getElementById('reportMonthSelect').onchange = renderAdminReports;
-        document.getElementById('btnExportMonthlyReportCsv').onclick = exportMonthlyReportsCsv;
-
-        // Push Notification Listeners
-        document.getElementById('btnRequestNotificationPerm').onclick = requestNotificationPermission;
-        document.getElementById('btnTestMorningNotification').onclick = () => {
-          dispatchScheduledNotification('İşe Giriş Hatırlatması (Test)', 'Lütfen işe giriş kaydınızı yapın.', 'test');
-        };
-        document.getElementById('btnTestEveningNotification').onclick = () => {
-          dispatchScheduledNotification('İşten Çıkış Hatırlatması (Test)', 'Lütfen işten çıkış kaydınızı yapın.', 'test');
-        };
-        document.getElementById('btnShowServerCodeModal').onclick = openServerCodeModal;
-
-        // Factory Reset Button
-        document.getElementById('btnResetDemoData').onclick = () => {
-          openModal('Fabrika Ayarlarına Dön / Sıfırla', `
-            <p class="text-xs text-slate-600">
-              Bu işlem tüm yerel verileri sıfırlayacak ve başlangıç örnek personelleri ile puantaj verilerini yeniden yükleyecektir. Devam etmek istiyor musunuz?
-            </p>
-          `, async () => {
-            localStorage.removeItem(STORAGE_KEY);
-            await seedDefaultData();
-            showToast('Tüm veriler fabrika ayarlarına sıfırlandı.', 'info');
-            handleLogout();
-          }, 'Evet, Sıfırla');
-        };
-      }
-
-      // -------------------------------------------------------------
-      // APP BOOTSTRAP
-      // -------------------------------------------------------------
-      async function init() {
-        await initializeDatabase();
-        attachEvents();
-
-        // Start live clock
-        updateLiveClock();
-        setInterval(updateLiveClock, 1000);
-
-        // Check if admin exists
-        if (!state.adminUser) {
-          document.getElementById('firstRunSetupNotice').classList.remove('hidden');
-        }
-
-        // Show login view
-        showView('login');
-      }
-
-      // Run on DOM ready
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-      } else {
-        init();
-      }
-
-    })();
-  </script>
-</body>
-</html>
+            <div class="p-3 bg-brand-50 rounded-xl text-xs text-br
